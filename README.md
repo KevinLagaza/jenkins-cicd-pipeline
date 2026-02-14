@@ -2,8 +2,14 @@
 
 ## Getting started
 
-The objective of this project is to design a **Continuous Integration (CI)** and **Continuous Deployment (CD)** pipeline for deploying a  [Spring Boot application](https://github.com/eazytraining/PayMyBuddy) on AWS. We will implement the necessary steps to ensure code quality and security while automating the deployment process.
+The objective of this project is to design a **Continuous Integration (CI)** and **Continuous Deployment (CD)** pipeline for deploying a  [Spring Boot application](https://github.com/eazytraining/PayMyBuddy) on AWS. We will implement the necessary steps to ensure code quality and security while automating the deployment process. Here is the git workflow:
+* On the main branch **(main)**, all stages must be executed, except the review deployment.
 
+* On **other branches**, only the following stages must be executed:
+
+    - Automated Tests
+    - Code Quality Check
+    - Build and Packaging
 
 
 ## Add your files
