@@ -1,0 +1,10 @@
+/root/PayMyBuddy/src/test/java/com/paymybuddy/paymybuddy/repository/TransactionRepositoryIT.java
+/root/PayMyBuddy/src/test/java/com/paymybuddy/paymybuddy/PayMyBuddyApplicationTests.java
+/root/PayMyBuddy/src/test/java/com/paymybuddy/paymybuddy/service/BankAccountServiceTest.java
+/root/PayMyBuddy/src/test/java/com/paymybuddy/paymybuddy/repository/BankAccountRepositoryIT.java
+/root/PayMyBuddy/src/test/java/com/paymybuddy/paymybuddy/repository/ConnectionRepositoryIT.java
+/root/PayMyBuddy/src/test/java/com/paymybuddy/paymybuddy/service/UserServiceTest.java
+/root/PayMyBuddy/src/test/java/com/paymybuddy/paymybuddy/service/ConnectionServiceTest.java
+/root/PayMyBuddy/src/test/java/com/paymybuddy/paymybuddy/repository/UserRepositoryIT.java
+/root/PayMyBuddy/src/test/java/com/paymybuddy/paymybuddy/service/TransactionServiceTest.java
+/root/PayMyBuddy/src/test/java/com/paymybuddy/paymybuddy/service/UserServiceIT.java
