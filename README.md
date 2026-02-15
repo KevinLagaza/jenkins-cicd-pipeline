@@ -26,8 +26,8 @@ Inside Jenkins, install the following plugins:
 
 * Docker
 * Docker Pipeline
-*
-*
+* JUnit
+* JaCoCo
 *
 
 ## 1) Automated testing
