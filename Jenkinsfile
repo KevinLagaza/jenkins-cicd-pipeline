@@ -10,6 +10,7 @@ pipeline {
         APP_NAME = 'paymybuddy'
         DOCKER_IMAGE = "kevinlagaza/${APP_NAME}"
         DOCKER_TAG = "${BUILD_NUMBER}"
+        SONAR_TOKEN = 'SonarQube'
         // DOCKER_CREDENTIALS = 'dockerhub-credentials'
     }
 
@@ -48,10 +49,10 @@ pipeline {
         stage('SonarQube Analysis') {
             steps {
                 echo "========== SONARQUBE ANALYSIS =========="
-                sh 'mvn sonar:sonar -Dsonar.token=jenkins-token'
-                // withSonarQubeEnv('SonarQube') {
-                //     sh 'mvn sonar:sonar'
-                // }
+                // sh 'mvn sonar:sonar -Dsonar.token=jenkins-token'
+                withSonarQubeEnv('${SonarQube}') {
+                    sh 'mvn sonar:sonar'
+                }
             }
         }
 
