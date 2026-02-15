@@ -48,7 +48,8 @@ pipeline {
         stage('SonarQube Analysis') {
             steps {
                 echo "========== SONARQUBE ANALYSIS =========="
-                withSonarQubeEnv('SonarQube') {
+                // sh 'mvn clean verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.token=myAuthenticationToken'
+                withSonarQubeEnv('SONAR_TOKEN') {
                     sh 'mvn sonar:sonar'
                 }
             }
