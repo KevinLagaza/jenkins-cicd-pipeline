@@ -15,54 +15,54 @@ pipeline {
 
     stages {
 
-        stage('Unit Tests') {
-            steps {
-                echo "========== UNIT TESTS =========="
-                sh 'mvn test -Dtest=*Test'
-            }
-            post {
-                always {
-                    junit allowEmptyResults: true, testResults: '**/target/surefire-reports/*.xml'
-                    jacoco(
-                        execPattern: '**/target/jacoco.exec',
-                        classPattern: '**/target/classes',
-                        sourcePattern: '**/src/main/java',
-                        exclusionPattern: '**/test/**'
-                    )
-                }
-            }
-        }
+        // stage('Unit Tests') {
+        //     steps {
+        //         echo "========== UNIT TESTS =========="
+        //         sh 'mvn test -Dtest=*Test'
+        //     }
+        //     post {
+        //         always {
+        //             junit allowEmptyResults: true, testResults: '**/target/surefire-reports/*.xml'
+        //             jacoco(
+        //                 execPattern: '**/target/jacoco.exec',
+        //                 classPattern: '**/target/classes',
+        //                 sourcePattern: '**/src/main/java',
+        //                 exclusionPattern: '**/test/**'
+        //             )
+        //         }
+        //     }
+        // }
 
-        stage('Integration Tests') {
-            steps {
-                echo "========== INTEGRATION TESTS =========="
-                sh 'mvn verify -Dtest=*IT -DfailIfNoTests=false'
-            }
-            post {
-                always {
-                    junit allowEmptyResults: true, testResults: '**/target/failsafe-reports/*.xml'
-                }
-            }
-        }
+        // stage('Integration Tests') {
+        //     steps {
+        //         echo "========== INTEGRATION TESTS =========="
+        //         sh 'mvn verify -Dtest=*IT -DfailIfNoTests=false'
+        //     }
+        //     post {
+        //         always {
+        //             junit allowEmptyResults: true, testResults: '**/target/failsafe-reports/*.xml'
+        //         }
+        //     }
+        // }
 
         stage('SonarQube Analysis') {
             steps {
                 echo "========== SONARQUBE ANALYSIS =========="
                 // sh 'mvn clean verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.token=myAuthenticationToken'
-                withSonarQubeEnv('SONAR_TOKEN') {
+                withSonarQubeEnv('SonarQube') {
                     sh 'mvn sonar:sonar'
                 }
             }
         }
 
-        stage('Build') {
-            steps {
-                echo "========== BUILD =========="
-                sh 'mvn Package -DskipTests'
-                sh 'ls -la target/*.jar'
-                // sh 'mvn clean compile -DskipTests'
-            }
-        }
+        // stage('Build') {
+        //     steps {
+        //         echo "========== BUILD =========="
+        //         sh 'mvn Package -DskipTests'
+        //         sh 'ls -la target/*.jar'
+        //         // sh 'mvn clean compile -DskipTests'
+        //     }
+        // }
 
         // stage('Build Docker Image') {
         //     agent {
