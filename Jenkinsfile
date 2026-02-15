@@ -48,7 +48,7 @@ pipeline {
         stage('SonarQube Analysis') {
             steps {
                 echo "========== SONARQUBE ANALYSIS =========="
-                sh 'mvn org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.token=jenkins-token'
+                sh 'mvn sonar:sonar -Dsonar.token=jenkins-token'
                 // withSonarQubeEnv('SonarQube') {
                 //     sh 'mvn sonar:sonar'
                 // }
