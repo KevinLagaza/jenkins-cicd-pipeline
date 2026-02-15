@@ -20,15 +20,20 @@ Recall that whether you are running Jenkins on a host machine or docker containe
 
 Create a sonarcloud account and generate a token that will be used in Jenkins. 
 
+**![Generating the sonar token ](./images/prerequisites/generate-sonar-token-jenkins.png)**
+
+**![Sonar token](./images/prerequisites/sonar-in-jenkins.png)**
+
 2) Jenkins
 
 Inside Jenkins, install the following plugins:
 
 * Docker
 * Docker Pipeline
-* JUnit
-* JaCoCo
-*
+* JUnit (for tests)
+* SonarQube Scanner (for static code analysis)
+* Slack Notification (for notification)
+* SSH Agent (for deployment)
 
 ## 1) Automated testing
 
@@ -41,7 +46,7 @@ We will execute unitary and integration tests.
 
 ## 2) Code quality
 
-We want to perform a static analysis of the code using SonarCloud. 
+We want to perform a static analysis of the code using SonarCloud. First, make sure to add the sonar token (done in the prerequisites' section) in the global credentials.  
 
 ## 3) Compilation and Packaging quality
 

@@ -2,7 +2,7 @@ pipeline {
     agent {
         docker {
             image 'maven:3.9.6-eclipse-temurin-17-alpine'
-            // args '-v $HOME/.m2:/root/.m2 -v /var/run/docker.sock:/var/run/docker.sock'
+            args '-v $HOME/.m2:/root/.m2 -v /var/run/docker.sock:/var/run/docker.sock'
         }
     }
 
@@ -45,13 +45,60 @@ pipeline {
             }
         }
 
+        stage('SonarQube Analysis') {
+            steps {
+                echo "========== SONARQUBE ANALYSIS =========="
+                withSonarQubeEnv('SonarQube') {
+                    sh 'mvn sonar:sonar'
+                }
+            }
+        }
+
         stage('Build') {
             steps {
                 echo "========== BUILD =========="
-                sh 'mvn clean install'
+                sh 'mvn Package -DskipTests'
+                sh 'ls -la target/*.jar'
                 // sh 'mvn clean compile -DskipTests'
             }
         }
+
+        // stage('Build Docker Image') {
+        //     agent {
+        //         docker {
+        //             image 'docker:24-cli'
+        //             args '-v /var/run/docker.sock:/var/run/docker.sock'
+        //         }
+        //     }
+        //     steps {
+        //         echo "========== BUILD DOCKER IMAGE =========="
+        //         sh """
+        //             docker build -t ${DOCKER_IMAGE}:${DOCKER_TAG} .
+        //         """
+        //     }
+        // }
+
+        // stage('Push Docker Image') {
+        //     agent {
+        //         docker {
+        //             image 'docker:24-cli'
+        //             args '-v /var/run/docker.sock:/var/run/docker.sock'
+        //         }
+        //     }
+        //     steps {
+        //         echo "========== PUSH DOCKER IMAGE =========="
+        //         withCredentials([usernamePassword(
+        //             credentialsId: DOCKER_CREDENTIALS,
+        //             usernameVariable: 'DOCKER_USER',
+        //             passwordVariable: 'DOCKER_PASS'
+        //         )]) {
+        //             sh """
+        //                 echo \$DOCKER_PASS | docker login -u \$DOCKER_USER --password-stdin
+        //                 docker push ${DOCKER_IMAGE}:${DOCKER_TAG}
+        //             """
+        //         }
+        //     }
+        // }
     }
 
     post {
