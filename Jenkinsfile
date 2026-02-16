@@ -71,7 +71,7 @@ pipeline {
                 //         -Dsonar.tests=src/test \
                 //         -Dsonar.java.binaries=target/classes
                 // '''
-                }
+                // }
             }
         }
 
