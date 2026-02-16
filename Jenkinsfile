@@ -46,13 +46,32 @@ pipeline {
         //     }
         // }
 
+        stage ('checkstyle code analysis'){
+            steps {
+                sh 'mvn checkstyle:checkstyle'
+            }
+        }
+
         stage('SonarQube Analysis') {
+            environment {
+                scannerHome = tool 'sonar-scanner-8'
+            }
             steps {
                 echo "========== SONARQUBE ANALYSIS =========="
-                sh 'mvn sonar:sonar -Dsonar.projectKey=samson-jean -Dsonar.token=jenkins_token -Dsonar.language=java -Dsonar.tests=src/test -Dsonar.sources=src/main/java' 
-                // withSonarQubeEnv('${SonarQube}') {
-                //     sh 'mvn sonar:sonar'
-                // }
+                // sh 'mvn sonar:sonar -Dsonar.projectKey=samson-jean -Dsonar.token=jenkins_token -Dsonar.language=java -Dsonar.tests=src/test -Dsonar.sources=src/main/java' 
+                withSonarQubeEnv('sonar-server') {
+                sh '''${scannerHome}/bin/sonar-scanner \
+                        -Dsonar.projectKey=samson-jean \
+                        -Dsonar.organization=samson_jean \
+                //      -Dsonar.projectName=javaapp-repo \
+                        -Dsonar.projectVersion=1.0 \
+                        -Dsonar.sources=src/java \
+                        -Dsonar.tests=src/test \
+                        -Dsonar.junit.reportsPath=target/surefire-reports/ \
+                        -Dsonar.jacoco.reportsPath=target/jacoco.exec \
+                        -Dsonar.java.checkstyle.reportPaths=target/checkstyle-result.xml
+                   '''
+                }
             }
         }
 
