@@ -51,7 +51,13 @@ pipeline {
         stage ('checkstyle code analysis'){
             steps {
                 echo "========== checkstyle ANALYSIS =========="
-                sh 'mvn checkstyle:checkstyle'
+                sh '''docker run --rm \
+                            -v "$(pwd)":/app \
+                            -v "$HOME/.m2":/root/.m2 \
+                            -w /app \
+                            maven:3.9.6-eclipse-temurin-17-alpine \
+                            mvn checkstyle:checkstyle
+                    '''
             }
         }
 
