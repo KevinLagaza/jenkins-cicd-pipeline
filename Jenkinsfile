@@ -12,46 +12,71 @@ pipeline {
         APP_NAME = 'paymybuddy'
         DOCKER_IMAGE = "kevinlagaza/${APP_NAME}"
         DOCKER_TAG = "${BUILD_NUMBER}"
-        SONAR_TOKEN = 'SonarQube'
+        // SONAR_TOKEN = 'SonarQube'
         // DOCKER_CREDENTIALS = 'dockerhub-credentials'
     }
 
     stages {
 
-        // stage('Unit Tests') {
-        //     steps {
-        //         echo "========== UNIT TESTS =========="
-        //         sh 'mvn test -Dtest=*Test'
-        //     }
-        //     post {
-        //         always {
-        //             junit allowEmptyResults: true, testResults: '**/target/surefire-reports/*.xml'
-        //             jacoco(
-        //                 execPattern: '**/target/jacoco.exec',
-        //                 classPattern: '**/target/classes',
-        //                 sourcePattern: '**/src/main/java',
-        //                 exclusionPattern: '**/test/**'
-        //             )
-        //         }
-        //     }
-        // }
+        stage('Build') {
+            steps {
+                echo "========== BUILD =========="
+                sh  '''docker run --rm \
+                        -v "$(pwd)":/app \
+                        -v "$HOME/.m2":/root/.m2 \
+                        -w /app \
+                        maven:3.9.6-eclipse-temurin-17-alpine \
+                        mvn clean compile -DskipTests
+                    '''
+            }
+        }
 
-        // stage('Integration Tests') {
-        //     steps {
-        //         echo "========== INTEGRATION TESTS =========="
-        //         sh 'mvn verify -Dtest=*IT -DfailIfNoTests=false'
-        //     }
-        //     post {
-        //         always {
-        //             junit allowEmptyResults: true, testResults: '**/target/failsafe-reports/*.xml'
-        //         }
-        //     }
-        // }
+        stage('Unit Tests') {
+            steps {
+                echo "========== UNIT TESTS =========="
+                sh  '''docker run --rm \
+                        -v "$(pwd)":/app \
+                        -v "$HOME/.m2":/root/.m2 \
+                        -w /app \
+                        maven:3.9.6-eclipse-temurin-17-alpine \
+                        mvn test -Dtest=*Test
+                    '''
+            }
+            post {
+                always {
+                    junit allowEmptyResults: true, testResults: '**/target/surefire-reports/*.xml'
+                    jacoco(
+                        execPattern: '**/target/jacoco.exec',
+                        classPattern: '**/target/classes',
+                        sourcePattern: '**/src/main/java',
+                        exclusionPattern: '**/test/**'
+                    )
+                }
+            }
+        }
+
+        stage('Integration Tests') {
+            steps {
+                echo "========== INTEGRATION TESTS =========="
+                sh  '''docker run --rm \
+                        -v "$(pwd)":/app \
+                        -v "$HOME/.m2":/root/.m2 \
+                        -w /app \
+                        maven:3.9.6-eclipse-temurin-17-alpine \
+                        mvn verify -Dtest=*IT -DfailIfNoTests=false
+                    '''
+            }
+            post {
+                always {
+                    junit allowEmptyResults: true, testResults: '**/target/failsafe-reports/*.xml'
+                }
+            }
+        }
 
         stage ('checkstyle code analysis'){
             steps {
                 echo "========== checkstyle ANALYSIS =========="
-                sh '''docker run --rm \
+                sh  '''docker run --rm \
                             -v "$(pwd)":/app \
                             -v "$HOME/.m2":/root/.m2 \
                             -w /app \
@@ -81,8 +106,7 @@ pipeline {
                 // }
 
                 withSonarQubeEnv('sonarqube') {
-                    sh '''
-                        docker run --rm \
+                    sh '''docker run --rm \
                             -v "$(pwd)":/app \
                             -v "$HOME/.m2":/root/.m2 \
                             -w /app \
@@ -99,14 +123,26 @@ pipeline {
             }
         }
 
-        // stage('Build') {
-        //     steps {
-        //         echo "========== BUILD =========="
-        //         sh 'mvn Package -DskipTests'
-        //         sh 'ls -la target/*.jar'
-        //         // sh 'mvn clean compile -DskipTests'
-        //     }
-        // }
+        stage('Compilation') {
+            steps {
+                echo "========== COMPILATION =========="
+                sh  '''docker run --rm \
+                        -v "$(pwd)":/app \
+                        -v "$HOME/.m2":/root/.m2 \
+                        -w /app \
+                        -e SONAR_HOST_URL="${SONAR_HOST_URL}" \
+                        -e SONAR_TOKEN="${SONAR_AUTH_TOKEN}" \
+                        maven:3.9.6-eclipse-temurin-17-alpine \
+                        mvn Package -DskipTests
+                    '''
+                sh 'ls -la target/*.jar'
+            }
+            post {
+                success {
+                    archiveArtifacts artifacts: 'target/*.jar', fingerprint: true
+                }
+            }
+        }
 
         // stage('Build Docker Image') {
         //     agent {
