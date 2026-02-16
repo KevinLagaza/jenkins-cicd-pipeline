@@ -133,7 +133,7 @@ pipeline {
                         -e SONAR_HOST_URL="${SONAR_HOST_URL}" \
                         -e SONAR_TOKEN="${SONAR_AUTH_TOKEN}" \
                         maven:3.9.6-eclipse-temurin-17-alpine \
-                        mvn Package -DskipTests
+                        mvn package -DskipTests
                     '''
                 sh 'ls -la target/*.jar'
             }
