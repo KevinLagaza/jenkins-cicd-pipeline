@@ -64,13 +64,9 @@ pipeline {
                 sh '''${scannerHome}/bin/sonar-scanner \
                         -Dsonar.projectKey=samson-jean \
                         -Dsonar.organization=samson_jean \
-                //      -Dsonar.projectName=javaapp-repo \
                         -Dsonar.projectVersion=1.0 \
                         -Dsonar.sources=src/java \
-                        -Dsonar.tests=src/test \
-                        -Dsonar.junit.reportsPath=target/surefire-reports/ \
-                        -Dsonar.jacoco.reportsPath=target/jacoco.exec \
-                        -Dsonar.java.checkstyle.reportPaths=target/checkstyle-result.xml
+                        -Dsonar.tests=src/test
                    '''
                 }
             }
