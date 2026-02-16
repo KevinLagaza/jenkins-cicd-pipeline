@@ -1,10 +1,12 @@
 pipeline {
-    agent {
-        docker {
-            image 'maven:3.9.6-eclipse-temurin-17-alpine'
-            args '-v $HOME/.m2:/root/.m2 -v /var/run/docker.sock:/var/run/docker.sock'
-        }
-    }
+    // agent {
+    //     docker {
+    //         image 'maven:3.9.6-eclipse-temurin-17-alpine'
+    //         args '-v $HOME/.m2:/root/.m2 -v /var/run/docker.sock:/var/run/docker.sock'
+    //     }
+    // }
+
+    agent any
 
     environment {
         APP_NAME = 'paymybuddy'
@@ -54,25 +56,39 @@ pipeline {
         // }
 
         stage('SonarQube Analysis') {
-            environment {
-                scannerHome = tool 'sonar-scanner-8'
-            }
+            // environment {
+            //     scannerHome = tool 'sonar-scanner-8'
+            // }
             steps {
                 echo "========== SONARQUBE ANALYSIS =========="
                 // sh 'mvn sonar:sonar -Dsonar.projectKey=samson-jean -Dsonar.token=jenkins_token -Dsonar.language=java -Dsonar.tests=src/test -Dsonar.sources=src/main/java' 
-                // sh 'ls -la'
-                // sh 'pwd'
+                // withSonarQubeEnv('sonarqube') {
+                // sh '''  
+                //     mvn sonar:sonar \
+                //         -Dsonar.projectKey=kevin_82_webapp \
+                //         -Dsonar.organization=samson-jean \
+                //         -Dsonar.projectVersion=1.0 \
+                //         -Dsonar.sources=src/java \
+                //         -Dsonar.tests=src/test \
+                //         -Dsonar.java.binaries=target/classes
+                // '''
+                // }
+
                 withSonarQubeEnv('sonarqube') {
-                sh '''  
-                    mvn sonar:sonar \
-                        -Dsonar.projectKey=kevin_82_webapp \
-                        -Dsonar.organization=samson-jean \
-                        -Dsonar.projectVersion=1.0 \
-                        -Dsonar.sources=src/java \
-                        -Dsonar.tests=src/test \
-                        -Dsonar.java.binaries=target/classes
-                '''
-                }
+                    sh '''
+                        docker run --rm \
+                            -v "$(pwd)":/app \
+                            -v "$HOME/.m2":/root/.m2 \
+                            -w /app \
+                            -e SONAR_HOST_URL="${SONAR_HOST_URL}" \
+                            -e SONAR_TOKEN="${SONAR_AUTH_TOKEN}" \
+                            maven:3.9.6-eclipse-temurin-17-alpine \
+                            mvn sonar:sonar \
+                                -Dsonar.projectKey=kevin_82_webapp \
+                                -Dsonar.organization=samson-jean \
+                                -Dsonar.host.url=${SONAR_HOST_URL} \
+                                -Dsonar.token=${SONAR_AUTH_TOKEN}
+                    '''
             }
         }
 
