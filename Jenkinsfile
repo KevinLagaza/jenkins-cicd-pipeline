@@ -49,10 +49,10 @@ pipeline {
         stage('SonarQube Analysis') {
             steps {
                 echo "========== SONARQUBE ANALYSIS =========="
-                // sh 'mvn sonar:sonar -Dsonar.token=jenkins-token'
-                withSonarQubeEnv('${SonarQube}') {
-                    sh 'mvn sonar:sonar'
-                }
+                sh 'mvn sonar:sonar -Dsonar.projectKey=samson-jean -Dsonar.token=jenkins_token -Dsonar.language=java -Dsonar.tests=src/test -Dsonar.sources=src/main/java' 
+                // withSonarQubeEnv('${SonarQube}') {
+                //     sh 'mvn sonar:sonar'
+                // }
             }
         }
 
@@ -97,6 +97,30 @@ pipeline {
         //             sh """
         //                 echo \$DOCKER_PASS | docker login -u \$DOCKER_USER --password-stdin
         //                 docker push ${DOCKER_IMAGE}:${DOCKER_TAG}
+        //             """
+        //         }
+        //     }
+        // }
+
+
+        // stage('Deploy to Production') {
+        //     when {
+        //         branch 'main'
+        //     }
+        //     input {
+        //         message "Deploy to production?"
+        //         ok "Deploy"
+        //     }
+        //     steps {
+        //         echo "========== DEPLOY TO PRODUCTION =========="
+        //         sshagent(['ssh-production-key']) {
+        //             sh """
+        //                 ssh -o StrictHostKeyChecking=no user@production-server '
+        //                     docker pull ${DOCKER_IMAGE}:${DOCKER_TAG} &&
+        //                     docker stop ${APP_NAME} || true &&
+        //                     docker rm ${APP_NAME} || true &&
+        //                     docker run -d --name ${APP_NAME} -p 8080:8080 ${DOCKER_IMAGE}:${DOCKER_TAG}
+        //                 '
         //             """
         //         }
         //     }
