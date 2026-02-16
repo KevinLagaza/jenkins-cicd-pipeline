@@ -62,7 +62,7 @@ pipeline {
                 // sh 'mvn sonar:sonar -Dsonar.projectKey=samson-jean -Dsonar.token=jenkins_token -Dsonar.language=java -Dsonar.tests=src/test -Dsonar.sources=src/main/java' 
                 withSonarQubeEnv('sonarqube') {
                 sh '''  
-                    ${scannerHome}/bin/sonar-scanner \
+                    mvn sonar:sonar \
                         -Dsonar.projectKey=samson-jean \
                         -Dsonar.organization=samson_jean \
                         -Dsonar.projectVersion=1.0 \
