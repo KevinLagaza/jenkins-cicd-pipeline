@@ -60,19 +60,19 @@ pipeline {
             steps {
                 echo "========== SONARQUBE ANALYSIS =========="
                 // sh 'mvn sonar:sonar -Dsonar.projectKey=samson-jean -Dsonar.token=jenkins_token -Dsonar.language=java -Dsonar.tests=src/test -Dsonar.sources=src/main/java' 
-                sh 'ls -la'
-                sh 'pwd'
-                // withSonarQubeEnv('sonarqube') {
-                // sh '''  
-                //     mvn sonar:sonar \
-                //         -Dsonar.projectKey=kevin_82_webapp \
-                //         -Dsonar.organization=samson-jean \
-                //         -Dsonar.projectVersion=1.0 \
-                //         -Dsonar.sources=src/java \
-                //         -Dsonar.tests=src/test \
-                //         -Dsonar.java.binaries=target/classes
-                // '''
-                // }
+                // sh 'ls -la'
+                // sh 'pwd'
+                withSonarQubeEnv('sonarqube') {
+                sh '''  
+                    mvn sonar:sonar \
+                        -Dsonar.projectKey=kevin_82_webapp \
+                        -Dsonar.organization=samson-jean \
+                        -Dsonar.projectVersion=1.0 \
+                        -Dsonar.sources=src/java \
+                        -Dsonar.tests=src/test \
+                        -Dsonar.java.binaries=target/classes
+                '''
+                }
             }
         }
 
