@@ -21,7 +21,8 @@ pipeline {
         stage('Build') {
             steps {
                 echo "========== BUILD =========="
-                sh  '''docker run --rm \
+                sh  '''
+                    docker run --rm \
                         -v "$(pwd)":/app \
                         -v "$HOME/.m2":/root/.m2 \
                         -w /app \
