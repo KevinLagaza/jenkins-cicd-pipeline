@@ -18,19 +18,6 @@ pipeline {
 
     stages {
 
-        stage('Build') {
-            steps {
-                echo "========== BUILD =========="
-                sh  '''docker run --rm \
-                        -v "$(pwd)":/app \
-                        -v "$HOME/.m2":/root/.m2 \
-                        -w /app \
-                        maven:3.9.6-eclipse-temurin-17-alpine \
-                        mvn clean compile -DskipTests
-                    '''
-            }
-        }
-
         stage('Unit Tests') {
             steps {
                 echo "========== UNIT TESTS =========="
@@ -133,7 +120,7 @@ pipeline {
                         -e SONAR_HOST_URL="${SONAR_HOST_URL}" \
                         -e SONAR_TOKEN="${SONAR_AUTH_TOKEN}" \
                         maven:3.9.6-eclipse-temurin-17-alpine \
-                        mvn package -DskipTests
+                        mvn clean compile -DskipTests
                     '''
                 sh 'ls -la target/*.jar'
             }
