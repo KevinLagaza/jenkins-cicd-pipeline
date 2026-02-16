@@ -61,7 +61,7 @@ pipeline {
                 echo "========== SONARQUBE ANALYSIS =========="
                 // sh 'mvn sonar:sonar -Dsonar.projectKey=samson-jean -Dsonar.token=jenkins_token -Dsonar.language=java -Dsonar.tests=src/test -Dsonar.sources=src/main/java' 
                 sh 'ls -la'
-                sh 'echo $USER'
+                sh 'pwd'
                 // withSonarQubeEnv('sonarqube') {
                 // sh '''  
                 //     mvn sonar:sonar \
