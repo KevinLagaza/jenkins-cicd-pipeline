@@ -11,8 +11,8 @@ pipeline {
     environment {
         APP_NAME = 'paymybuddy'
         MAVEN_IMAGE = 'maven:3.9.6-eclipse-temurin-17-alpine'
-        DOCKER_IMAGE = "kevinlagaza/${APP_NAME}"
-        DOCKER_TAG = "${BUILD_NUMBER}"
+        DOCKER_IMAGE = 'kevinlagaza/${APP_NAME}'
+        DOCKER_TAG = '${BUILD_NUMBER}'
         // SONAR_TOKEN = 'SonarQube'
         // DOCKER_CREDENTIALS = 'dockerhub-credentials'
     }
@@ -21,30 +21,31 @@ pipeline {
 
         stage('Build') {
             steps {
-                echo "========== BUILD =========="
-                sh """
+                echo '========== BUILD =========='
+                sh '''
                     docker run --rm \
                         -v \$(pwd):/app \
                         -v \$HOME/.m2:/root/.m2 \
                         -w /app \
                         ${MAVEN_IMAGE} \
                         mvn clean compile -DskipTests
-                """
-                sh 'Finished BUILD'
+                '''
+                echo '========== FINISHED BUILD =========='
             }
         }
 
         stage('Unit Tests') {
             steps {
-                echo "========== UNIT TESTS =========="
-                sh """
+                echo '========== UNIT TESTS =========='
+                sh '''
                     docker run --rm \
                         -v \$(pwd):/app \
                         -v \$HOME/.m2:/root/.m2 \
                         -w /app \
                         ${MAVEN_IMAGE} \
                         mvn test -Dtest=*Test
-                """
+                '''
+                echo '========== FINISHED UNIT TESTS =========='
             }
             post {
                 always {
@@ -55,15 +56,16 @@ pipeline {
 
         stage('Integration Tests') {
             steps {
-                echo "========== INTEGRATION TESTS =========="
-                sh """
+                echo '========== INTEGRATION TESTS =========='
+                sh '''
                     docker run --rm \
                         -v \$(pwd):/app \
                         -v \$HOME/.m2:/root/.m2 \
                         -w /app \
                         ${MAVEN_IMAGE} \
                         mvn verify -Dtest=*IT -DfailIfNoTests=false
-                """
+                '''
+                echo '========== FINISHED INTEGRATION TESTS =========='
             }
             post {
                 always {
@@ -72,17 +74,18 @@ pipeline {
             }
         }
 
-        stage ('checkstyle code analysis'){
+        stage ('Checkstyle Code Analysis'){
             steps {
-                echo "========== checkstyle ANALYSIS =========="
-                sh """
+                echo '========== CHECKSTYLE ANALYSIS =========='
+                sh '''
                     docker run --rm \
                         -v \$(pwd):/app \
                         -v \$HOME/.m2:/root/.m2 \
                         -w /app \
                         ${MAVEN_IMAGE} \
                         mvn checkstyle:checkstyle
-                """
+                '''
+                echo '========== FINISHED CHECKSTYLE ANALYSIS =========='
             }
         }
 
@@ -91,7 +94,7 @@ pipeline {
             //     scannerHome = tool 'sonar-scanner-8'
             // }
             steps {
-                echo "========== SONARQUBE ANALYSIS =========="
+                echo '========== SONARQUBE ANALYSIS =========='
                 // sh 'mvn sonar:sonar -Dsonar.projectKey=samson-jean -Dsonar.token=jenkins_token -Dsonar.language=java -Dsonar.tests=src/test -Dsonar.sources=src/main/java' 
                 // withSonarQubeEnv('sonarqube') {
                 // sh '''  
@@ -120,12 +123,13 @@ pipeline {
                                 -Dsonar.token=${SONAR_AUTH_TOKEN}
                     '''
                 }
+                echo 'FINISHED SONARQUBE ANALYSIS'
             }
         }
 
         stage('Compilation') {
             steps {
-                echo "========== COMPILATION =========="
+                echo '========== COMPILATION =========='
                 sh  '''
                     docker run --rm \
                         -v "$(pwd)":/app \
@@ -135,8 +139,9 @@ pipeline {
                         -e SONAR_TOKEN="${SONAR_AUTH_TOKEN}" \
                         ${MAVEN_IMAGE} \
                         mvn package -DskipTests
-                    '''
+                '''
                 sh 'ls -la target/*.jar'
+                echo 'FINISHED COMPILATION'
             }
             post {
                 success {
@@ -153,10 +158,8 @@ pipeline {
         //         }
         //     }
         //     steps {
-        //         echo "========== BUILD DOCKER IMAGE =========="
-        //         sh """
-        //             docker build -t ${DOCKER_IMAGE}:${DOCKER_TAG} .
-        //         """
+        //         echo '========== BUILD DOCKER IMAGE =========='
+        //         sh 'docker build -t ${DOCKER_IMAGE}:${DOCKER_TAG} .'
         //     }
         // }
 
@@ -168,16 +171,16 @@ pipeline {
         //         }
         //     }
         //     steps {
-        //         echo "========== PUSH DOCKER IMAGE =========="
+        //         echo '========== PUSH DOCKER IMAGE =========='
         //         withCredentials([usernamePassword(
         //             credentialsId: DOCKER_CREDENTIALS,
         //             usernameVariable: 'DOCKER_USER',
         //             passwordVariable: 'DOCKER_PASS'
         //         )]) {
-        //             sh """
+        //             sh '''
         //                 echo \$DOCKER_PASS | docker login -u \$DOCKER_USER --password-stdin
         //                 docker push ${DOCKER_IMAGE}:${DOCKER_TAG}
-        //             """
+        //             '''
         //         }
         //     }
         // }
@@ -188,20 +191,20 @@ pipeline {
         //         branch 'main'
         //     }
         //     input {
-        //         message "Deploy to production?"
-        //         ok "Deploy"
+        //         message 'Deploy to production?'
+        //         ok 'Deploy'
         //     }
         //     steps {
-        //         echo "========== DEPLOY TO PRODUCTION =========="
+        //         echo '========== DEPLOY TO PRODUCTION =========='
         //         sshagent(['ssh-production-key']) {
-        //             sh """
+        //             sh '''
         //                 ssh -o StrictHostKeyChecking=no user@production-server '
         //                     docker pull ${DOCKER_IMAGE}:${DOCKER_TAG} &&
         //                     docker stop ${APP_NAME} || true &&
         //                     docker rm ${APP_NAME} || true &&
         //                     docker run -d --name ${APP_NAME} -p 8080:8080 ${DOCKER_IMAGE}:${DOCKER_TAG}
         //                 '
-        //             """
+        //             '''
         //         }
         //     }
         // }
@@ -209,10 +212,10 @@ pipeline {
 
     post {
         success {
-            echo "✅ Pipeline completed successfully!"
+            echo '✅ Pipeline completed successfully!'
         }
         failure {
-            echo "❌ Pipeline failed!"
+            echo '❌ Pipeline failed!'
         }
         always {
             cleanWs()
