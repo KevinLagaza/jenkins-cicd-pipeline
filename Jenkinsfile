@@ -10,6 +10,7 @@ pipeline {
 
     environment {
         APP_NAME = 'paymybuddy'
+        MAVEN_IMAGE = 'maven:3.9.6-eclipse-temurin-17-alpine'
         DOCKER_IMAGE = "kevinlagaza/${APP_NAME}"
         DOCKER_TAG = "${BUILD_NUMBER}"
         // SONAR_TOKEN = 'SonarQube'
@@ -21,14 +22,14 @@ pipeline {
         stage('Build') {
             steps {
                 echo "========== BUILD =========="
-                sh  '''
+                sh """
                     docker run --rm \
-                        -v "$(pwd)":/app \
-                        -v "$HOME/.m2":/root/.m2 \
+                        -v \$(pwd):/app \
+                        -v \$HOME/.m2:/root/.m2 \
                         -w /app \
-                        maven:3.9.6-eclipse-temurin-17-alpine \
+                        ${MAVEN_IMAGE} \
                         mvn clean compile -DskipTests
-                    '''
+                """
                 sh 'Finished BUILD'
             }
         }
@@ -36,23 +37,18 @@ pipeline {
         stage('Unit Tests') {
             steps {
                 echo "========== UNIT TESTS =========="
-                sh  '''docker run --rm \
-                        -v "$(pwd)":/app \
-                        -v "$HOME/.m2":/root/.m2 \
+                sh """
+                    docker run --rm \
+                        -v \$(pwd):/app \
+                        -v \$HOME/.m2:/root/.m2 \
                         -w /app \
-                        maven:3.9.6-eclipse-temurin-17-alpine \
+                        ${MAVEN_IMAGE} \
                         mvn test -Dtest=*Test
-                    '''
+                """
             }
             post {
                 always {
                     junit allowEmptyResults: true, testResults: '**/target/surefire-reports/*.xml'
-                    jacoco(
-                        execPattern: '**/target/jacoco.exec',
-                        classPattern: '**/target/classes',
-                        sourcePattern: '**/src/main/java',
-                        exclusionPattern: '**/test/**'
-                    )
                 }
             }
         }
@@ -60,13 +56,14 @@ pipeline {
         stage('Integration Tests') {
             steps {
                 echo "========== INTEGRATION TESTS =========="
-                sh  '''docker run --rm \
-                        -v "$(pwd)":/app \
-                        -v "$HOME/.m2":/root/.m2 \
+                sh """
+                    docker run --rm \
+                        -v \$(pwd):/app \
+                        -v \$HOME/.m2:/root/.m2 \
                         -w /app \
-                        maven:3.9.6-eclipse-temurin-17-alpine \
+                        ${MAVEN_IMAGE} \
                         mvn verify -Dtest=*IT -DfailIfNoTests=false
-                    '''
+                """
             }
             post {
                 always {
@@ -78,13 +75,14 @@ pipeline {
         stage ('checkstyle code analysis'){
             steps {
                 echo "========== checkstyle ANALYSIS =========="
-                sh  '''docker run --rm \
-                            -v "$(pwd)":/app \
-                            -v "$HOME/.m2":/root/.m2 \
-                            -w /app \
-                            maven:3.9.6-eclipse-temurin-17-alpine \
-                            mvn checkstyle:checkstyle
-                    '''
+                sh """
+                    docker run --rm \
+                        -v \$(pwd):/app \
+                        -v \$HOME/.m2:/root/.m2 \
+                        -w /app \
+                        ${MAVEN_IMAGE} \
+                        mvn checkstyle:checkstyle
+                """
             }
         }
 
@@ -114,7 +112,7 @@ pipeline {
                             -w /app \
                             -e SONAR_HOST_URL="${SONAR_HOST_URL}" \
                             -e SONAR_TOKEN="${SONAR_AUTH_TOKEN}" \
-                            maven:3.9.6-eclipse-temurin-17-alpine \
+                            ${MAVEN_IMAGE} \
                             mvn sonar:sonar \
                                 -Dsonar.projectKey=kevin_82_webapp \
                                 -Dsonar.organization=samson-jean \
@@ -128,13 +126,14 @@ pipeline {
         stage('Compilation') {
             steps {
                 echo "========== COMPILATION =========="
-                sh  '''docker run --rm \
+                sh  '''
+                    docker run --rm \
                         -v "$(pwd)":/app \
                         -v "$HOME/.m2":/root/.m2 \
                         -w /app \
                         -e SONAR_HOST_URL="${SONAR_HOST_URL}" \
                         -e SONAR_TOKEN="${SONAR_AUTH_TOKEN}" \
-                        maven:3.9.6-eclipse-temurin-17-alpine \
+                        ${MAVEN_IMAGE} \
                         mvn package -DskipTests
                     '''
                 sh 'ls -la target/*.jar'
