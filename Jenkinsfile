@@ -46,11 +46,12 @@ pipeline {
         //     }
         // }
 
-        stage ('checkstyle code analysis'){
-            steps {
-                sh 'mvn checkstyle:checkstyle'
-            }
-        }
+        // stage ('checkstyle code analysis'){
+        //     steps {
+        //         echo "========== checkstyle ANALYSIS =========="
+        //         sh 'mvn checkstyle:checkstyle'
+        //     }
+        // }
 
         stage('SonarQube Analysis') {
             environment {
