@@ -151,23 +151,23 @@ pipeline {
             }
         }
 
-        stage('Build Docker Image') {
-            steps {
-                script {
-                    dockerImage = docker.build("${DOCKER_IMAGE}:${DOCKER_TAG}")
-                }
-            }
-        }
+        // stage('Build Docker Image') {
+        //     steps {
+        //         script {
+        //             dockerImage = docker.build("${DOCKER_IMAGE}:${DOCKER_TAG}")
+        //         }
+        //     }
+        // }
 
-        stage('Push to Registry') {
-            steps {
-                script {
-                    docker.withRegistry("${REGISTRY_URL}", "${DOCKER_CREDENTIALS}") {
-                        dockerImage.push("${DOCKER_TAG}")
-                    }
-                }
-            }
-        }
+        // stage('Push to Registry') {
+        //     steps {
+        //         script {
+        //             docker.withRegistry("${REGISTRY_URL}", "${DOCKER_CREDENTIALS}") {
+        //                 dockerImage.push("${DOCKER_TAG}")
+        //             }
+        //         }
+        //     }
+        // }
 
         // stage('Build Docker Image') {
         //     agent {
