@@ -155,7 +155,6 @@ pipeline {
             steps {
                 script {
                     dockerImage = docker.build("${DOCKER_IMAGE}:${DOCKER_TAG}")
-                    }
                 }
             }
         }
@@ -227,8 +226,7 @@ pipeline {
         //             '''
         //         }
         //     }
-        // }
-    }
+        }
 
     post {
         success {
