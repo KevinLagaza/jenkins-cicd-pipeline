@@ -22,11 +22,10 @@ Create a sonarcloud account and generate a token that will be used in Jenkins.
 
 **![Generating the sonar token ](./images/prerequisites/generate-sonar-token-jenkins.png)**
 
-**![Sonar token](./images/prerequisites/sonar-in-jenkins.png)**
-
 2) Jenkins
 
-Inside Jenkins, install the following plugins:
+---
+a) Install the following plugins:
 
 * Docker
 * Docker Pipeline
@@ -34,6 +33,13 @@ Inside Jenkins, install the following plugins:
 * SonarQube Scanner (for static code analysis)
 * Slack Notification (for notification)
 * SSH Agent (for deployment)
+
+b) Add dockerhub and sonarcloud credentials
+
+**![Dockerhub credentials](./images/prerequisites/dockerhub-cred.png)**
+
+**![Sonar token](./images/prerequisites/sonar-in-jenkins.png)**
+
 
 ## 1) Automated testing
 

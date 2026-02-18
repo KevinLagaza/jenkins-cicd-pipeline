@@ -13,8 +13,9 @@ pipeline {
         MAVEN_IMAGE = 'maven:3.9.6-eclipse-temurin-17-alpine'
         DOCKER_IMAGE = 'kevinlagaza/${APP_NAME}'
         DOCKER_TAG = '${BUILD_NUMBER}'
+        REGISTRY_URL = 'https://index.docker.io/v1/'
+        DOCKER_CREDENTIALS = 'dockerhub-credentials'
         // SONAR_TOKEN = 'SonarQube'
-        // DOCKER_CREDENTIALS = 'dockerhub-credentials'
     }
 
     stages {
@@ -146,6 +147,17 @@ pipeline {
             post {
                 success {
                     archiveArtifacts artifacts: 'target/*.jar', fingerprint: true
+                }
+            }
+        }
+
+        stage('Build and Push Docker Image') {
+            steps {
+                script {
+                    dockerImage = docker.build("${DOCKER_IMAGE}:${DOCKER_TAG}")
+                    docker.withRegistry("${REGISTRY_URL}", "${DOCKER_CREDENTIALS}") {
+                        dockerImage.push("${DOCKER_TAG}")
+                    }
                 }
             }
         }
