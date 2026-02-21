@@ -20,17 +20,19 @@ pipeline {
 
     stages {
 
-         stage('Checkout') {
+        stage('Checkout') {
             steps {
-                // Clean workspace before checkout
-                cleanWs()
-                
-                // Explicit checkout
-                checkout scm
-                
-                // Verify checkout
-                sh 'ls -la'
-                sh 'git status'
+                checkout([
+                    $class: 'GitSCM',
+                    branches: [[name: '*/main']],
+                    extensions: [
+                        [$class: 'CleanBeforeCheckout'],
+                        [$class: 'CloneOption', depth: 1, noTags: false, shallow: true]
+                    ],
+                    userRemoteConfigs: [[
+                        url: 'https://github.com/KevinLagaza/jenkins-cicd-pipeline.git'
+                    ]]
+                ])
             }
         }
 
