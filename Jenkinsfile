@@ -22,34 +22,32 @@ pipeline {
 
         stage('Checkout') {
             steps {
-                checkout([
-                    $class: 'GitSCM',
-                    branches: [[name: '*/main']],
-                    extensions: [
-                        [$class: 'CleanBeforeCheckout'],
-                        [$class: 'CloneOption', depth: 1, noTags: false, shallow: true]
-                    ],
-                    userRemoteConfigs: [[
-                        url: 'https://github.com/KevinLagaza/jenkins-cicd-pipeline.git'
-                    ]]
-                ])
+                // Clean workspace before checkout
+                cleanWs()
+                
+                // Explicit checkout
+                checkout scm
+                
+                // Verify checkout
+                sh 'ls -la'
+                sh 'git status'
             }
         }
 
-        stage('Build') {
-            steps {
-                echo '========== BUILD =========='
-                sh '''
-                    docker run --rm \
-                        -v \$(pwd):/app \
-                        -v \$HOME/.m2:/root/.m2 \
-                        -w /app \
-                        ${MAVEN_IMAGE} \
-                        mvn clean compile -DskipTests
-                '''
-                echo '========== FINISHED BUILD =========='
-            }
-        }
+        // stage('Build') {
+        //     steps {
+        //         echo '========== BUILD =========='
+        //         sh '''
+        //             docker run --rm \
+        //                 -v \$(pwd):/app \
+        //                 -v \$HOME/.m2:/root/.m2 \
+        //                 -w /app \
+        //                 ${MAVEN_IMAGE} \
+        //                 mvn clean compile -DskipTests
+        //         '''
+        //         echo '========== FINISHED BUILD =========='
+        //     }
+        // }
 
         // stage('Unit Tests') {
         //     steps {
@@ -144,35 +142,35 @@ pipeline {
         //     }
         // }
 
-        stage('Compilation') {
-            steps {
-                echo '========== COMPILATION =========='
-                sh  '''
-                    docker run --rm \
-                        -v "$(pwd)":/app \
-                        -v "$HOME/.m2":/root/.m2 \
-                        -w /app \
-                        ${MAVEN_IMAGE} \
-                        mvn package -DskipTests
-                '''
-                sh 'ls -la target/*.jar'
-                sh 'ls -lart'
-                echo 'FINISHED COMPILATION'
-            }
-            post {
-                success {
-                    archiveArtifacts artifacts: 'target/*.jar', fingerprint: true
-                }
-            }
-        }
+        // stage('Compilation') {
+        //     steps {
+        //         echo '========== COMPILATION =========='
+        //         sh  '''
+        //             docker run --rm \
+        //                 -v "$(pwd)":/app \
+        //                 -v "$HOME/.m2":/root/.m2 \
+        //                 -w /app \
+        //                 ${MAVEN_IMAGE} \
+        //                 mvn package -DskipTests
+        //         '''
+        //         sh 'ls -la target/*.jar'
+        //         sh 'ls -lart'
+        //         echo 'FINISHED COMPILATION'
+        //     }
+        //     post {
+        //         success {
+        //             archiveArtifacts artifacts: 'target/*.jar', fingerprint: true
+        //         }
+        //     }
+        // }
 
-        stage('Build Docker Image') {
-            steps {
-                script {
-                    dockerImage = docker.build("${DOCKER_IMAGE}:${DOCKER_TAG}")
-                }
-            }
-        }
+        // stage('Build Docker Image') {
+        //     steps {
+        //         script {
+        //             dockerImage = docker.build("${DOCKER_IMAGE}:${DOCKER_TAG}")
+        //         }
+        //     }
+        // }
 
         // stage('Push to Registry') {
         //     steps {
