@@ -20,6 +20,20 @@ pipeline {
 
     stages {
 
+         stage('Checkout') {
+            steps {
+                // Clean workspace before checkout
+                cleanWs()
+                
+                // Explicit checkout
+                checkout scm
+                
+                // Verify checkout
+                sh 'ls -la'
+                sh 'git status'
+            }
+        }
+
         stage('Build') {
             steps {
                 echo '========== BUILD =========='
