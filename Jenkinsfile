@@ -136,8 +136,6 @@ pipeline {
                         -v "$(pwd)":/app \
                         -v "$HOME/.m2":/root/.m2 \
                         -w /app \
-                        -e SONAR_HOST_URL="${SONAR_HOST_URL}" \
-                        -e SONAR_TOKEN="${SONAR_AUTH_TOKEN}" \
                         ${MAVEN_IMAGE} \
                         mvn package -DskipTests
                 '''
