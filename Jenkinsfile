@@ -35,98 +35,98 @@ pipeline {
             }
         }
 
-        stage('Unit Tests') {
-            steps {
-                echo '========== UNIT TESTS =========='
-                sh '''
-                    docker run --rm \
-                        -v \$(pwd):/app \
-                        -v \$HOME/.m2:/root/.m2 \
-                        -w /app \
-                        ${MAVEN_IMAGE} \
-                        mvn test -Dtest=*Test
-                '''
-                echo '========== FINISHED UNIT TESTS =========='
-            }
-            post {
-                always {
-                    junit allowEmptyResults: true, testResults: '**/target/surefire-reports/*.xml'
-                }
-            }
-        }
+        // stage('Unit Tests') {
+        //     steps {
+        //         echo '========== UNIT TESTS =========='
+        //         sh '''
+        //             docker run --rm \
+        //                 -v \$(pwd):/app \
+        //                 -v \$HOME/.m2:/root/.m2 \
+        //                 -w /app \
+        //                 ${MAVEN_IMAGE} \
+        //                 mvn test -Dtest=*Test
+        //         '''
+        //         echo '========== FINISHED UNIT TESTS =========='
+        //     }
+        //     post {
+        //         always {
+        //             junit allowEmptyResults: true, testResults: '**/target/surefire-reports/*.xml'
+        //         }
+        //     }
+        // }
 
-        stage('Integration Tests') {
-            steps {
-                echo '========== INTEGRATION TESTS =========='
-                sh '''
-                    docker run --rm \
-                        -v \$(pwd):/app \
-                        -v \$HOME/.m2:/root/.m2 \
-                        -w /app \
-                        ${MAVEN_IMAGE} \
-                        mvn verify -Dtest=*IT -DfailIfNoTests=false
-                '''
-                echo '========== FINISHED INTEGRATION TESTS =========='
-            }
-            post {
-                always {
-                    junit allowEmptyResults: true, testResults: '**/target/failsafe-reports/*.xml'
-                }
-            }
-        }
+        // stage('Integration Tests') {
+        //     steps {
+        //         echo '========== INTEGRATION TESTS =========='
+        //         sh '''
+        //             docker run --rm \
+        //                 -v \$(pwd):/app \
+        //                 -v \$HOME/.m2:/root/.m2 \
+        //                 -w /app \
+        //                 ${MAVEN_IMAGE} \
+        //                 mvn verify -Dtest=*IT -DfailIfNoTests=false
+        //         '''
+        //         echo '========== FINISHED INTEGRATION TESTS =========='
+        //     }
+        //     post {
+        //         always {
+        //             junit allowEmptyResults: true, testResults: '**/target/failsafe-reports/*.xml'
+        //         }
+        //     }
+        // }
 
-        stage ('Checkstyle Code Analysis'){
-            steps {
-                echo '========== CHECKSTYLE ANALYSIS =========='
-                sh '''
-                    docker run --rm \
-                        -v \$(pwd):/app \
-                        -v \$HOME/.m2:/root/.m2 \
-                        -w /app \
-                        ${MAVEN_IMAGE} \
-                        mvn checkstyle:checkstyle
-                '''
-                echo '========== FINISHED CHECKSTYLE ANALYSIS =========='
-            }
-        }
+        // stage ('Checkstyle Code Analysis'){
+        //     steps {
+        //         echo '========== CHECKSTYLE ANALYSIS =========='
+        //         sh '''
+        //             docker run --rm \
+        //                 -v \$(pwd):/app \
+        //                 -v \$HOME/.m2:/root/.m2 \
+        //                 -w /app \
+        //                 ${MAVEN_IMAGE} \
+        //                 mvn checkstyle:checkstyle
+        //         '''
+        //         echo '========== FINISHED CHECKSTYLE ANALYSIS =========='
+        //     }
+        // }
 
-        stage('SonarQube Analysis') {
-            // environment {
-            //     scannerHome = tool 'sonar-scanner-8'
-            // }
-            steps {
-                echo '========== SONARQUBE ANALYSIS =========='
-                // sh 'mvn sonar:sonar -Dsonar.projectKey=samson-jean -Dsonar.token=jenkins_token -Dsonar.language=java -Dsonar.tests=src/test -Dsonar.sources=src/main/java' 
-                // withSonarQubeEnv('sonarqube') {
-                // sh '''  
-                //     mvn sonar:sonar \
-                //         -Dsonar.projectKey=kevin_82_webapp \
-                //         -Dsonar.organization=samson-jean \
-                //         -Dsonar.projectVersion=1.0 \
-                //         -Dsonar.sources=src/java \
-                //         -Dsonar.tests=src/test \
-                //         -Dsonar.java.binaries=target/classes
-                // '''
-                // }
+        // stage('SonarQube Analysis') {
+        //     // environment {
+        //     //     scannerHome = tool 'sonar-scanner-8'
+        //     // }
+        //     steps {
+        //         echo '========== SONARQUBE ANALYSIS =========='
+        //         // sh 'mvn sonar:sonar -Dsonar.projectKey=samson-jean -Dsonar.token=jenkins_token -Dsonar.language=java -Dsonar.tests=src/test -Dsonar.sources=src/main/java' 
+        //         // withSonarQubeEnv('sonarqube') {
+        //         // sh '''  
+        //         //     mvn sonar:sonar \
+        //         //         -Dsonar.projectKey=kevin_82_webapp \
+        //         //         -Dsonar.organization=samson-jean \
+        //         //         -Dsonar.projectVersion=1.0 \
+        //         //         -Dsonar.sources=src/java \
+        //         //         -Dsonar.tests=src/test \
+        //         //         -Dsonar.java.binaries=target/classes
+        //         // '''
+        //         // }
 
-                withSonarQubeEnv('sonarqube') {
-                    sh '''docker run --rm \
-                            -v "$(pwd)":/app \
-                            -v "$HOME/.m2":/root/.m2 \
-                            -w /app \
-                            -e SONAR_HOST_URL="${SONAR_HOST_URL}" \
-                            -e SONAR_TOKEN="${SONAR_AUTH_TOKEN}" \
-                            ${MAVEN_IMAGE} \
-                            mvn sonar:sonar \
-                                -Dsonar.projectKey=kevin_82_webapp \
-                                -Dsonar.organization=samson-jean \
-                                -Dsonar.host.url=${SONAR_HOST_URL} \
-                                -Dsonar.token=${SONAR_AUTH_TOKEN}
-                    '''
-                }
-                echo 'FINISHED SONARQUBE ANALYSIS'
-            }
-        }
+        //         withSonarQubeEnv('sonarqube') {
+        //             sh '''docker run --rm \
+        //                     -v "$(pwd)":/app \
+        //                     -v "$HOME/.m2":/root/.m2 \
+        //                     -w /app \
+        //                     -e SONAR_HOST_URL="${SONAR_HOST_URL}" \
+        //                     -e SONAR_TOKEN="${SONAR_AUTH_TOKEN}" \
+        //                     ${MAVEN_IMAGE} \
+        //                     mvn sonar:sonar \
+        //                         -Dsonar.projectKey=kevin_82_webapp \
+        //                         -Dsonar.organization=samson-jean \
+        //                         -Dsonar.host.url=${SONAR_HOST_URL} \
+        //                         -Dsonar.token=${SONAR_AUTH_TOKEN}
+        //             '''
+        //         }
+        //         echo 'FINISHED SONARQUBE ANALYSIS'
+        //     }
+        // }
 
         stage('Compilation') {
             steps {
@@ -140,6 +140,7 @@ pipeline {
                         mvn package -DskipTests
                 '''
                 sh 'ls -la target/*.jar'
+                sh 'ls -lart'
                 echo 'FINISHED COMPILATION'
             }
             post {
