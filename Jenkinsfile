@@ -30,7 +30,7 @@ pipeline {
         // stage('Unit Tests') {
         //     agent {
         //         docker {
-        //             image ${MAVEN_IMAGE}
+        //             image "${MAVEN_IMAGE}"
         //             args '-v $HOME/.m2:/root/.m2'
         //             reuseNode true
         //         }
@@ -50,7 +50,7 @@ pipeline {
         // stage('Integration Tests') {
         //     agent {
         //         docker {
-        //             image '${MAVEN_IMAGE}'
+        //             image "${MAVEN_IMAGE}"
         //             args '-v $HOME/.m2:/root/.m2'
         //             reuseNode true
         //         }
@@ -70,7 +70,7 @@ pipeline {
         // stage ('Checkstyle Code Analysis'){
         //     agent {
         //         docker {
-        //             image '${MAVEN_IMAGE}'
+        //             image "${MAVEN_IMAGE}"
         //             args '-v $HOME/.m2:/root/.m2'
         //             reuseNode true
         //         }
@@ -85,7 +85,7 @@ pipeline {
         // stage('SonarQube Analysis') {
         //     agent {
         //         docker {
-        //             image '${MAVEN_IMAGE}'
+        //             image "${MAVEN_IMAGE}"
         //             args '-v $HOME/.m2:/root/.m2'
         //             reuseNode true
         //         }
@@ -127,7 +127,23 @@ pipeline {
             }
         }
 
-        // stage('Build Docker Image') {
+        stage('Build Docker Image') {
+            agent {
+                docker {
+                    image 'docker:24-cli'
+                    args '-v /var/run/docker.sock:/var/run/docker.sock'
+                    reuseNode true
+                }
+            }
+            steps {
+                echo '========== BUILD DOCKER IMAGE =========='
+                sh 'ls -al'
+                sh "docker build -t ${DOCKER_IMAGE}:${DOCKER_TAG} ."
+                echo '========== FINISHED BUILDING DOCKER IMAGE =========='
+            }
+        }
+
+        // stage('Push Docker Image') {
         //     agent {
         //         docker {
         //             image 'docker:24-cli'
@@ -136,10 +152,20 @@ pipeline {
         //         }
         //     }
         //     steps {
-        //         echo '========== BUILD DOCKER IMAGE =========='
-        //         sh 'ls -al'
-        //         sh 'docker build -t ${DOCKER_IMAGE}:${DOCKER_TAG} .'
-        //         echo '========== FINISHED BUILDING DOCKER IMAGE =========='
+        //         echo "========== PUSH DOCKER IMAGE =========="
+        //         withCredentials([usernamePassword(
+        //             credentialsId: "${DOCKER_CREDENTIALS}",
+        //             usernameVariable: 'DOCKER_USER',
+        //             passwordVariable: 'DOCKER_PASS'
+        //         )]) {
+        //             sh """
+        //                 echo \$DOCKER_PASS | docker login -u \$DOCKER_USER --password-stdin
+        //                 docker push ${DOCKER_IMAGE}:${DOCKER_TAG}
+        //                 docker push ${DOCKER_IMAGE}:latest
+        //                 docker logout
+        //             """
+        //         }
+        //         echo "========== FINISHED PUSHING DOCKER IMAGE =========="
         //     }
         // }
 
