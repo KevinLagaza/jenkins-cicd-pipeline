@@ -180,31 +180,40 @@ pipeline {
         // }
 
         stage('Deploy to Staging') {
-            when {
-                expression { 
-                    return env.BRANCH_NAME == 'main'
-                }
-            }
+
             steps {
-                echo "========== DEPLOY TO STAGING =========="
-                sshagent(credentials: ["${STAGING_SSH_KEY}"]) {
-                    sh """
-                        ssh -o StrictHostKeyChecking=no ${SSH_USER}@${STAGING_HOST} '
-                            docker pull ${DOCKER_IMAGE}:${DOCKER_TAG} &&
-                            docker stop ${APP_NAME} || true &&
-                            docker rm ${APP_NAME} || true &&
-                            docker run -d \
-                                --name ${APP_NAME} \
-                                -p ${APP_PORT}:${CONTAINER_PORT} \
-                                --restart unless-stopped \
-                                -e SPRING_PROFILES_ACTIVE=staging \
-                                ${DOCKER_IMAGE}:${DOCKER_TAG} &&
-                            sleep 10 &&
-                            docker ps | grep ${APP_NAME}
-                        '
-                    """
-                }
+                echo "GIT_BRANCH: ${env.GIT_BRANCH}"
+                echo "BRANCH_NAME: ${env.BRANCH_NAME}"
+                echo "GIT_LOCAL_BRANCH: ${env.GIT_LOCAL_BRANCH}"
+                sh 'git branch --show-current || echo "Cannot determine branch"'
+                sh 'git rev-parse --abbrev-ref HEAD || echo "Cannot get HEAD"'
             }
+
+            // when {
+            //     expression { 
+            //         return env.BRANCH_NAME == 'main'
+            //     }
+            // }
+            // steps {
+            //     echo "========== DEPLOY TO STAGING =========="
+            //     sshagent(credentials: ["${STAGING_SSH_KEY}"]) {
+            //         sh """
+            //             ssh -o StrictHostKeyChecking=no ${SSH_USER}@${STAGING_HOST} '
+            //                 docker pull ${DOCKER_IMAGE}:${DOCKER_TAG} &&
+            //                 docker stop ${APP_NAME} || true &&
+            //                 docker rm ${APP_NAME} || true &&
+            //                 docker run -d \
+            //                     --name ${APP_NAME} \
+            //                     -p ${APP_PORT}:${CONTAINER_PORT} \
+            //                     --restart unless-stopped \
+            //                     -e SPRING_PROFILES_ACTIVE=staging \
+            //                     ${DOCKER_IMAGE}:${DOCKER_TAG} &&
+            //                 sleep 10 &&
+            //                 docker ps | grep ${APP_NAME}
+            //             '
+            //         """
+            //     }
+            // }
             post {
                 success {
                     echo "✅ Staging deployment successful!"
