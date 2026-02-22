@@ -6,7 +6,7 @@ pipeline {
         MAVEN_IMAGE = 'maven:3.9.6-eclipse-temurin-17-alpine'
         DOCKER_IMAGE = 'kevinlagaza/${APP_NAME}'
         DOCKER_TAG = '${BUILD_NUMBER}'
-        REGISTRY_URL = 'https://index.docker.io/v1/'
+        // REGISTRY_URL = 'https://index.docker.io/v1/'
         DOCKER_CREDENTIALS = 'dockerhub-credentials'
     }
 
@@ -143,31 +143,30 @@ pipeline {
             }
         }
 
-        // stage('Push Docker Image') {
-        //     agent {
-        //         docker {
-        //             image 'docker:24-cli'
-        //             args '-v /var/run/docker.sock:/var/run/docker.sock'
-        //             reuseNode true
-        //         }
-        //     }
-        //     steps {
-        //         echo "========== PUSH DOCKER IMAGE =========="
-        //         withCredentials([usernamePassword(
-        //             credentialsId: "${DOCKER_CREDENTIALS}",
-        //             usernameVariable: 'DOCKER_USER',
-        //             passwordVariable: 'DOCKER_PASS'
-        //         )]) {
-        //             sh """
-        //                 echo \$DOCKER_PASS | docker login -u \$DOCKER_USER --password-stdin
-        //                 docker push ${DOCKER_IMAGE}:${DOCKER_TAG}
-        //                 docker push ${DOCKER_IMAGE}:latest
-        //                 docker logout
-        //             """
-        //         }
-        //         echo "========== FINISHED PUSHING DOCKER IMAGE =========="
-        //     }
-        // }
+        stage('Push Docker Image') {
+            agent {
+                docker {
+                    image 'docker:24-cli'
+                    args '-v /var/run/docker.sock:/var/run/docker.sock'
+                    reuseNode true
+                }
+            }
+            steps {
+                echo "========== PUSH DOCKER IMAGE =========="
+                withCredentials([usernamePassword(
+                    credentialsId: "${DOCKER_CREDENTIALS}",
+                    usernameVariable: 'DOCKER_USER',
+                    passwordVariable: 'DOCKER_PASS'
+                )]) {
+                    sh """
+                        echo \$DOCKER_PASS | docker login -u \$DOCKER_USER --password-stdin
+                        docker push ${DOCKER_IMAGE}:${DOCKER_TAG}
+                        docker logout
+                    """
+                }
+                echo "========== FINISHED PUSHING DOCKER IMAGE =========="
+            }
+        }
 
 
         // stage('Deploy to Production') {
