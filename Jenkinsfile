@@ -152,10 +152,7 @@ pipeline {
             }
             steps {
                 echo '========== BUILD DOCKER IMAGE =========='
-                sh '''
-                    docker build -t ${DOCKER_IMAGE}:${DOCKER_TAG} .
-                    docker tag ${DOCKER_IMAGE}:${DOCKER_TAG} ${DOCKER_IMAGE}:latest
-                '''
+                sh 'docker build -t ${DOCKER_IMAGE}:${DOCKER_TAG} .'
                 echo '========== FINISHED BUILDING DOCKER IMAGE =========='
             }
         }
