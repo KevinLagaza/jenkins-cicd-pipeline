@@ -174,19 +174,22 @@ pipeline {
             }
         }
 
-        stage('Cleanup') {
-            steps {
-                sh "docker rmi ${DOCKER_IMAGE}:${DOCKER_TAG} || true"
-            }
-        }
-
         stage('Deploy to Staging') {
+
+            agent {
+                docker {
+                    image 'docker:24-cli'
+                    args '-v /var/run/docker.sock:/var/run/docker.sock'
+                    reuseNode true
+                }
+            }
 
             when {
                 expression { 
                     return env.GIT_BRANCH == 'origin/main'
                 }
             }
+
             steps {
                 echo "========== DEPLOY TO STAGING =========="
                 sshagent(credentials: ["${STAGING_SSH_KEY}"]) {
@@ -209,7 +212,7 @@ pipeline {
 
                             echo "=== Verifying deployment ===" &&
                             sleep 10 &&
-                            docker ps
+                            docker ps | grep ${APP_NAME}
                         "
                     """
                 }
@@ -224,71 +227,49 @@ pipeline {
             }
         }
 
-        stage('Deploy to Production') {
-
-            when {
-                expression { 
-                    return env.GIT_BRANCH == 'origin/main'
-                }
-            }
-            steps {
-                echo "========== DEPLOY TO PRODUCTION =========="
-                sshagent(credentials: ["${PRODUCTION_SSH_KEY}"]) {
-                    sh """
-                        ssh -o StrictHostKeyChecking=no ${SSH_USER}@${PRODUCTION_HOST} "
-
-                            echo "=== Pulling new image ===" &&
-                            docker pull ${DOCKER_IMAGE}:${DOCKER_TAG} &&
-
-                            echo "=== Stopping old container ===" &&
-                            docker stop ${APP_NAME} || true &&
-                            docker rm ${APP_NAME} || true &&
-
-                            echo "=== Starting new container ===" &&
-                            docker run -d \
-                                --name ${APP_NAME} \
-                                -p ${APP_PORT}:${CONTAINER_PORT} \
-                                -e SPRING_PROFILES_ACTIVE=production \
-                                ${DOCKER_IMAGE}:${DOCKER_TAG} &&
-                            sleep 10 &&
-                            docker ps
-                        "
-                    """
-                }
-            }
-            post {
-                success {
-                    echo "✅ Production deployment successful!"
-                }
-                failure {
-                    echo "❌ Production deployment failed!"
-                }
-            }
-        }
-
-
         // stage('Deploy to Production') {
+
         //     when {
-        //         branch 'main'
-        //     }
-        //     input {
-        //         message 'Deploy to production?'
-        //         ok 'Deploy'
-        //     }
-        //     steps {
-        //         echo '========== DEPLOY TO PRODUCTION =========='
-        //         sshagent(['ssh-production-key']) {
-        //             sh '''
-        //                 ssh -o StrictHostKeyChecking=no user@production-server '
-        //                     docker pull ${DOCKER_IMAGE}:${DOCKER_TAG} &&
-        //                     docker stop ${APP_NAME} || true &&
-        //                     docker rm ${APP_NAME} || true &&
-        //                     docker run -d --name ${APP_NAME} -p 8080:8080 ${DOCKER_IMAGE}:${DOCKER_TAG}
-        //                 '
-        //             '''
+        //         expression { 
+        //             return env.GIT_BRANCH == 'origin/main'
         //         }
         //     }
-        }
+        //     steps {
+        //         echo "========== DEPLOY TO PRODUCTION =========="
+        //         sshagent(credentials: ["${PRODUCTION_SSH_KEY}"]) {
+        //             sh """
+        //                 ssh -o StrictHostKeyChecking=no ${SSH_USER}@${PRODUCTION_HOST} "
+
+        //                     echo "=== Pulling new image ===" &&
+        //                     docker pull ${DOCKER_IMAGE}:${DOCKER_TAG} &&
+
+        //                     echo "=== Stopping old container ===" &&
+        //                     docker stop ${APP_NAME} || true &&
+        //                     docker rm ${APP_NAME} || true &&
+
+        //                     echo "=== Starting new container ===" &&
+        //                     docker run -d \
+        //                         --name ${APP_NAME} \
+        //                         -p ${APP_PORT}:${CONTAINER_PORT} \
+        //                         -e SPRING_PROFILES_ACTIVE=production \
+        //                         ${DOCKER_IMAGE}:${DOCKER_TAG} &&
+        //                     sleep 10 &&
+        //                     docker ps
+        //                 "
+        //             """
+        //         }
+        //     }
+        //     post {
+        //         success {
+        //             echo "✅ Production deployment successful!"
+        //         }
+        //         failure {
+        //             echo "❌ Production deployment failed!"
+        //         }
+        //     }
+        // }
+
+    }
 
     post {
         success {
