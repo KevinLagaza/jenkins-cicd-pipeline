@@ -191,7 +191,7 @@ pipeline {
                 echo "========== DEPLOY TO STAGING =========="
                 sshagent(credentials: ["${STAGING_SSH_KEY}"]) {
                     sh """
-                        ssh -o StrictHostKeyChecking=no ${SSH_USER}@${STAGING_HOST} '
+                        ssh -o StrictHostKeyChecking=no ${SSH_USER}@${STAGING_HOST} "
 
                             echo "=== Pulling new image ===" &&
                             docker pull ${DOCKER_IMAGE}:${DOCKER_TAG} &&
@@ -206,11 +206,11 @@ pipeline {
                                 -p ${APP_PORT}:${CONTAINER_PORT} \
                                 -e SPRING_PROFILES_ACTIVE=staging \
                                 ${DOCKER_IMAGE}:${DOCKER_TAG} &&
-                                
+
                             echo "=== Verifying deployment ===" &&
                             sleep 10 &&
                             docker ps | grep ${APP_NAME}
-                        '
+                        "
                     """
                 }
             }
@@ -235,7 +235,7 @@ pipeline {
                 echo "========== DEPLOY TO PRODUCTION =========="
                 sshagent(credentials: ["${PRODUCTION_SSH_KEY}"]) {
                     sh """
-                        ssh -o StrictHostKeyChecking=no ${SSH_USER}@${PRODUCTION_HOST} '
+                        ssh -o StrictHostKeyChecking=no ${SSH_USER}@${PRODUCTION_HOST} "
                             docker pull ${DOCKER_IMAGE}:${DOCKER_TAG} &&
                             docker rm -f ${APP_NAME} || true &&
                             docker run -d \
@@ -245,7 +245,7 @@ pipeline {
                                 ${DOCKER_IMAGE}:${DOCKER_TAG} &&
                             sleep 10 &&
                             docker ps | grep ${APP_NAME}
-                        '
+                        "
                     """
                 }
             }
