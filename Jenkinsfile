@@ -182,7 +182,7 @@ pipeline {
         stage('Deploy to Staging') {
             when {
                 expression { 
-                    return env.GIT_BRANCH == 'main'
+                    return env.BRANCH_NAME == 'main'
                 }
             }
             steps {
