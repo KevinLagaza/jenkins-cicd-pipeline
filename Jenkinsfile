@@ -1,12 +1,5 @@
 pipeline {
-    // agent {
-    //     docker {
-    //         image 'maven:3.9.6-eclipse-temurin-17-alpine'
-    //         args '-v $HOME/.m2:/root/.m2 -v /var/run/docker.sock:/var/run/docker.sock'
-    //     }
-    // }
-
-    agent any
+    agent none
 
     environment {
         APP_NAME = 'paymybuddy'
@@ -35,16 +28,15 @@ pipeline {
         // }
 
         stage('Build') {
+            agent {
+                docker {
+                    image 'maven:3.9.6-eclipse-temurin-17-alpine'
+                    args '-v $HOME/.m2:/root/.m2 -v /var/run/docker.sock:/var/run/docker.sock'
+                }
+            }
             steps {
                 echo '========== BUILD =========='
-                sh '''
-                    docker run --rm \
-                        -v \$(pwd):/app \
-                        -v \$HOME/.m2:/root/.m2 \
-                        -w /app \
-                        ${MAVEN_IMAGE} \
-                        mvn clean compile -DskipTests
-                '''
+                sh 'mvn clean compile -DskipTests'
                 echo '========== FINISHED BUILD =========='
             }
         }
@@ -142,35 +134,35 @@ pipeline {
         //     }
         // }
 
-        stage('Compilation') {
-            steps {
-                echo '========== COMPILATION =========='
-                sh  '''
-                    docker run --rm \
-                        -v "$(pwd)":/app \
-                        -v "$HOME/.m2":/root/.m2 \
-                        -w /app \
-                        ${MAVEN_IMAGE} \
-                        mvn package -DskipTests
-                '''
-                sh 'ls -la target/*.jar'
-                sh 'ls -lart'
-                echo 'FINISHED COMPILATION'
-            }
-            post {
-                success {
-                    archiveArtifacts artifacts: 'target/*.jar', fingerprint: true
-                }
-            }
-        }
+        // stage('Compilation') {
+        //     steps {
+        //         echo '========== COMPILATION =========='
+        //         sh  '''
+        //             docker run --rm \
+        //                 -v "$(pwd)":/app \
+        //                 -v "$HOME/.m2":/root/.m2 \
+        //                 -w /app \
+        //                 ${MAVEN_IMAGE} \
+        //                 mvn package -DskipTests
+        //         '''
+        //         sh 'ls -la target/*.jar'
+        //         sh 'ls -lart'
+        //         echo 'FINISHED COMPILATION'
+        //     }
+        //     post {
+        //         success {
+        //             archiveArtifacts artifacts: 'target/*.jar', fingerprint: true
+        //         }
+        //     }
+        // }
 
-        stage('Build Docker Image') {
-            steps {
-                script {
-                    dockerImage = docker.build("${DOCKER_IMAGE}:${DOCKER_TAG}")
-                }
-            }
-        }
+        // stage('Build Docker Image') {
+        //     steps {
+        //         script {
+        //             dockerImage = docker.build("${DOCKER_IMAGE}:${DOCKER_TAG}")
+        //         }
+        //     }
+        // }
 
         // stage('Push to Registry') {
         //     steps {
