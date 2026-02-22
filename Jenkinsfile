@@ -182,14 +182,6 @@ pipeline {
 
         stage('Deploy to Staging') {
 
-            // steps {
-            //     echo "GIT_BRANCH: ${env.GIT_BRANCH}"
-            //     echo "BRANCH_NAME: ${env.BRANCH_NAME}"
-            //     echo "GIT_LOCAL_BRANCH: ${env.GIT_LOCAL_BRANCH}"
-            //     sh 'git branch --show-current || echo "Cannot determine branch"'
-            //     sh 'git rev-parse --abbrev-ref HEAD || echo "Cannot get HEAD"'
-            // }
-
             when {
                 expression { 
                     return env.GIT_BRANCH == 'origin/main'
@@ -213,14 +205,6 @@ pipeline {
                             docker ps | grep ${APP_NAME}
                         '
                     """
-                }
-            }
-            post {
-                success {
-                    echo "✅ Staging deployment successful!"
-                }
-                failure {
-                    echo "❌ Staging deployment failed!"
                 }
             }
         }
