@@ -190,23 +190,44 @@ pipeline {
             }
             steps {
                 echo "========== DEPLOY TO STAGING =========="
-                sshagent(credentials: ["${STAGING_SSH_KEY}"]) {
-                    sh """
-                        ssh -o StrictHostKeyChecking=no ${SSH_USER}@${STAGING_HOST} '
-                            docker pull ${DOCKER_IMAGE}:${DOCKER_TAG} &&
-                            docker stop ${APP_NAME} || true &&
-                            docker rm ${APP_NAME} || true &&
+                withCredentials([sshUserPrivateKey(
+                    credentialsId: 'staging-ssh-key',
+                    keyFileVariable: 'SSH_KEY_FILE',
+                    usernameVariable: 'SSH_USERNAME'
+                )]) {
+                    sh '''
+                        chmod 600 $SSH_KEY_FILE
+                        ssh -i $SSH_KEY_FILE -o StrictHostKeyChecking=no $SSH_USERNAME@''' + "${STAGING_HOST}" + ''' "
+                            docker pull ''' + "${DOCKER_IMAGE}:${DOCKER_TAG}" + ''' &&
+                            docker stop ''' + "${APP_NAME}" + ''' || true &&
+                            docker rm ''' + "${APP_NAME}" + ''' || true &&
                             docker run -d \
-                                --name ${APP_NAME} \
-                                -p ${APP_PORT}:${CONTAINER_PORT} \
+                                --name ''' + "${APP_NAME}" + ''' \
+                                -p ''' + "${APP_PORT}:${CONTAINER_PORT}" + ''' \
                                 --restart unless-stopped \
-                                -e SPRING_PROFILES_ACTIVE=staging \
-                                ${DOCKER_IMAGE}:${DOCKER_TAG} &&
-                            sleep 10 &&
-                            docker ps | grep ${APP_NAME}
-                        '
-                    """
+                                ''' + "${DOCKER_IMAGE}:${DOCKER_TAG}" + '''
+                        "
+                    '''
                 }
+
+
+                // sshagent(credentials: ["${STAGING_SSH_KEY}"]) {
+                //     sh """
+                //         ssh -o StrictHostKeyChecking=no ${SSH_USER}@${STAGING_HOST} '
+                //             docker pull ${DOCKER_IMAGE}:${DOCKER_TAG} &&
+                //             docker stop ${APP_NAME} || true &&
+                //             docker rm ${APP_NAME} || true &&
+                //             docker run -d \
+                //                 --name ${APP_NAME} \
+                //                 -p ${APP_PORT}:${CONTAINER_PORT} \
+                //                 --restart unless-stopped \
+                //                 -e SPRING_PROFILES_ACTIVE=staging \
+                //                 ${DOCKER_IMAGE}:${DOCKER_TAG} &&
+                //             sleep 10 &&
+                //             docker ps | grep ${APP_NAME}
+                //         '
+                //     """
+                // }
             }
             post {
                 success {
