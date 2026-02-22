@@ -8,7 +8,6 @@ pipeline {
         DOCKER_TAG = '${BUILD_NUMBER}'
         REGISTRY_URL = 'https://index.docker.io/v1/'
         DOCKER_CREDENTIALS = 'dockerhub-credentials'
-        // SONAR_TOKEN = 'SonarQube'
     }
 
     stages {
@@ -30,7 +29,7 @@ pipeline {
         stage('Build') {
             agent {
                 docker {
-                    image 'maven:3.9.6-eclipse-temurin-17-alpine'
+                    image '${MAVEN_IMAGE}'
                     args '-v $HOME/.m2:/root/.m2'
                     reuseNode true
                 }
@@ -45,7 +44,7 @@ pipeline {
         // stage('Unit Tests') {
         //     agent {
         //         docker {
-        //             image 'maven:3.9.6-eclipse-temurin-17-alpine'
+        //             image '${MAVEN_IMAGE}'
         //             args '-v $HOME/.m2:/root/.m2'
         //             reuseNode true
         //         }
@@ -65,7 +64,7 @@ pipeline {
         // stage('Integration Tests') {
         //     agent {
         //         docker {
-        //             image 'maven:3.9.6-eclipse-temurin-17-alpine'
+        //             image '${MAVEN_IMAGE}'
         //             args '-v $HOME/.m2:/root/.m2'
         //             reuseNode true
         //         }
@@ -85,7 +84,7 @@ pipeline {
         stage ('Checkstyle Code Analysis'){
             agent {
                 docker {
-                    image 'maven:3.9.6-eclipse-temurin-17-alpine'
+                    image '${MAVEN_IMAGE}'
                     args '-v $HOME/.m2:/root/.m2'
                     reuseNode true
                 }
@@ -100,7 +99,7 @@ pipeline {
         // stage('SonarQube Analysis') {
         //     agent {
         //         docker {
-        //             image 'maven:3.9.6-eclipse-temurin-17-alpine'
+        //             image '${MAVEN_IMAGE}'
         //             args '-v $HOME/.m2:/root/.m2'
         //             reuseNode true
         //         }
@@ -124,7 +123,7 @@ pipeline {
         stage('Compilation') {
             agent {
                 docker {
-                    image 'maven:3.9.6-eclipse-temurin-17-alpine'
+                    image '${MAVEN_IMAGE}'
                     args '-v $HOME/.m2:/root/.m2'
                     reuseNode true
                 }
@@ -152,55 +151,11 @@ pipeline {
             }
             steps {
                 echo '========== BUILD DOCKER IMAGE =========='
+                sh 'ls -al'
                 sh 'docker build -t ${DOCKER_IMAGE}:${DOCKER_TAG} .'
                 echo '========== FINISHED BUILDING DOCKER IMAGE =========='
             }
         }
-
-        // stage('Push to Registry') {
-        //     steps {
-        //         script {
-        //             docker.withRegistry("${REGISTRY_URL}", "${DOCKER_CREDENTIALS}") {
-        //                 dockerImage.push("${DOCKER_TAG}")
-        //             }
-        //         }
-        //     }
-        // }
-
-        // stage('Build Docker Image') {
-        //     agent {
-        //         docker {
-        //             image 'docker:24-cli'
-        //             args '-v /var/run/docker.sock:/var/run/docker.sock'
-        //         }
-        //     }
-        //     steps {
-        //         echo '========== BUILD DOCKER IMAGE =========='
-        //         sh 'docker build -t ${DOCKER_IMAGE}:${DOCKER_TAG} .'
-        //     }
-        // }
-
-        // stage('Push Docker Image') {
-        //     agent {
-        //         docker {
-        //             image 'docker:24-cli'
-        //             args '-v /var/run/docker.sock:/var/run/docker.sock'
-        //         }
-        //     }
-        //     steps {
-        //         echo '========== PUSH DOCKER IMAGE =========='
-        //         withCredentials([usernamePassword(
-        //             credentialsId: DOCKER_CREDENTIALS,
-        //             usernameVariable: 'DOCKER_USER',
-        //             passwordVariable: 'DOCKER_PASS'
-        //         )]) {
-        //             sh '''
-        //                 echo \$DOCKER_PASS | docker login -u \$DOCKER_USER --password-stdin
-        //                 docker push ${DOCKER_IMAGE}:${DOCKER_TAG}
-        //             '''
-        //         }
-        //     }
-        // }
 
 
         // stage('Deploy to Production') {
