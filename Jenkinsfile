@@ -159,27 +159,26 @@ pipeline {
         //     }
         // }
 
-        // stage('Compilation') {
-        //     steps {
-        //         echo '========== COMPILATION =========='
-        //         sh  '''
-        //             docker run --rm \
-        //                 -v "$(pwd)":/app \
-        //                 -v "$HOME/.m2":/root/.m2 \
-        //                 -w /app \
-        //                 ${MAVEN_IMAGE} \
-        //                 mvn package -DskipTests
-        //         '''
-        //         sh 'ls -la target/*.jar'
-        //         sh 'ls -lart'
-        //         echo 'FINISHED COMPILATION'
-        //     }
-        //     post {
-        //         success {
-        //             archiveArtifacts artifacts: 'target/*.jar', fingerprint: true
-        //         }
-        //     }
-        // }
+        stage('Compilation') {
+            agent {
+                docker {
+                    image 'maven:3.9.6-eclipse-temurin-17-alpine'
+                    args '-v $HOME/.m2:/root/.m2'
+                    reuseNode true
+                }
+            }
+            steps {
+                echo '========== COMPILATION =========='
+                sh  'mvn package -DskipTests'
+                sh 'ls -la target/*.jar'
+                echo 'FINISHED COMPILATION'
+            }
+            post {
+                success {
+                    archiveArtifacts artifacts: 'target/*.jar', fingerprint: true
+                }
+            }
+        }
 
         // stage('Build Docker Image') {
         //     steps {
