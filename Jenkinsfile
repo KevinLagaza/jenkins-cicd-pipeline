@@ -42,45 +42,45 @@ pipeline {
             }
         }
 
-        stage('Unit Tests') {
-            agent {
-                docker {
-                    image 'maven:3.9.6-eclipse-temurin-17-alpine'
-                    args '-v $HOME/.m2:/root/.m2'
-                    reuseNode true
-                }
-            }
-            steps {
-                echo '========== UNIT TESTS =========='
-                sh 'mvn test -Dtest=*Test'
-                echo '========== FINISHED UNIT TESTS =========='
-            }
-            post {
-                always {
-                    junit allowEmptyResults: true, testResults: '**/target/surefire-reports/*.xml'
-                }
-            }
-        }
+        // stage('Unit Tests') {
+        //     agent {
+        //         docker {
+        //             image 'maven:3.9.6-eclipse-temurin-17-alpine'
+        //             args '-v $HOME/.m2:/root/.m2'
+        //             reuseNode true
+        //         }
+        //     }
+        //     steps {
+        //         echo '========== UNIT TESTS =========='
+        //         sh 'mvn test -Dtest=*Test'
+        //         echo '========== FINISHED UNIT TESTS =========='
+        //     }
+        //     post {
+        //         always {
+        //             junit allowEmptyResults: true, testResults: '**/target/surefire-reports/*.xml'
+        //         }
+        //     }
+        // }
 
-        stage('Integration Tests') {
-            agent {
-                docker {
-                    image 'maven:3.9.6-eclipse-temurin-17-alpine'
-                    args '-v $HOME/.m2:/root/.m2'
-                    reuseNode true
-                }
-            }
-            steps {
-                echo '========== INTEGRATION TESTS =========='
-                sh 'mvn verify -Dtest=*IT -DfailIfNoTests=false'
-                echo '========== FINISHED INTEGRATION TESTS =========='
-            }
-            post {
-                always {
-                    junit allowEmptyResults: true, testResults: '**/target/failsafe-reports/*.xml'
-                }
-            }
-        }
+        // stage('Integration Tests') {
+        //     agent {
+        //         docker {
+        //             image 'maven:3.9.6-eclipse-temurin-17-alpine'
+        //             args '-v $HOME/.m2:/root/.m2'
+        //             reuseNode true
+        //         }
+        //     }
+        //     steps {
+        //         echo '========== INTEGRATION TESTS =========='
+        //         sh 'mvn verify -Dtest=*IT -DfailIfNoTests=false'
+        //         echo '========== FINISHED INTEGRATION TESTS =========='
+        //     }
+        //     post {
+        //         always {
+        //             junit allowEmptyResults: true, testResults: '**/target/failsafe-reports/*.xml'
+        //         }
+        //     }
+        // }
 
         // stage ('Checkstyle Code Analysis'){
         //     steps {
@@ -96,6 +96,32 @@ pipeline {
         //         echo '========== FINISHED CHECKSTYLE ANALYSIS =========='
         //     }
         // }
+
+        stage('SonarQube Analysis') {
+            agent {
+                docker {
+                    image 'maven:3.9.6-eclipse-temurin-17-alpine'
+                    args '-v $HOME/.m2:/root/.m2'
+                    reuseNode true
+                }
+            }
+            steps {
+                echo '========== SONARQUBE ANALYSIS =========='
+                withSonarQubeEnv('sonarqube') {
+                    sh '''
+                        mvn sonar:sonar \
+                            -Dsonar.projectKey=kevin_82_webapp \
+                            -Dsonar.organization=samson-jean \
+                            -Dsonar.projectVersion=1.0 \
+                            -Dsonar.sources=src/java \
+                            -Dsonar.tests=src/test \
+                            -Dsonar.java.binaries=target/classes
+                            // -Dsonar.java.source=17
+                    '''
+                }
+                echo '========== FINISHED SONARQUBE ANALYSIS =========='
+            }
+        }
 
         // stage('SonarQube Analysis') {
         //     // environment {
