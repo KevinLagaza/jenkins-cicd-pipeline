@@ -82,22 +82,7 @@ pipeline {
         //     }
         // }
 
-        // stage ('Checkstyle Code Analysis'){
-        //     steps {
-        //         echo '========== CHECKSTYLE ANALYSIS =========='
-        //         sh '''
-        //             docker run --rm \
-        //                 -v \$(pwd):/app \
-        //                 -v \$HOME/.m2:/root/.m2 \
-        //                 -w /app \
-        //                 ${MAVEN_IMAGE} \
-        //                 mvn checkstyle:checkstyle
-        //         '''
-        //         echo '========== FINISHED CHECKSTYLE ANALYSIS =========='
-        //     }
-        // }
-
-        stage('SonarQube Analysis') {
+        stage ('Checkstyle Code Analysis'){
             agent {
                 docker {
                     image 'maven:3.9.6-eclipse-temurin-17-alpine'
@@ -106,58 +91,35 @@ pipeline {
                 }
             }
             steps {
-                echo '========== SONARQUBE ANALYSIS =========='
-                withSonarQubeEnv('sonarqube') {
-                    sh 'ls -lart'
-                    sh '''
-                        mvn sonar:sonar \
-                            -Dsonar.projectKey=kevin_82_webapp \
-                            -Dsonar.organization=samson-jean \
-                            -Dsonar.projectVersion=1.0 \
-                            -Dsonar.java.source=17
-                    '''
-                }
-                echo '========== FINISHED SONARQUBE ANALYSIS =========='
+                echo '========== CHECKSTYLE ANALYSIS =========='
+                sh 'mvn checkstyle:checkstyle'
+                echo '========== FINISHED CHECKSTYLE ANALYSIS =========='
             }
         }
 
         // stage('SonarQube Analysis') {
-        //     // environment {
-        //     //     scannerHome = tool 'sonar-scanner-8'
-        //     // }
+        //     agent {
+        //         docker {
+        //             image 'maven:3.9.6-eclipse-temurin-17-alpine'
+        //             args '-v $HOME/.m2:/root/.m2'
+        //             reuseNode true
+        //         }
+        //     }
         //     steps {
         //         echo '========== SONARQUBE ANALYSIS =========='
-        //         // sh 'mvn sonar:sonar -Dsonar.projectKey=samson-jean -Dsonar.token=jenkins_token -Dsonar.language=java -Dsonar.tests=src/test -Dsonar.sources=src/main/java' 
-        //         // withSonarQubeEnv('sonarqube') {
-        //         // sh '''  
-        //         //     mvn sonar:sonar \
-        //         //         -Dsonar.projectKey=kevin_82_webapp \
-        //         //         -Dsonar.organization=samson-jean \
-        //         //         -Dsonar.projectVersion=1.0 \
-        //         //         -Dsonar.sources=src/java \
-        //         //         -Dsonar.tests=src/test \
-        //         //         -Dsonar.java.binaries=target/classes
-        //         // '''
-        //         // }
-
         //         withSonarQubeEnv('sonarqube') {
-        //             sh '''docker run --rm \
-        //                     -v "$(pwd)":/app \
-        //                     -v "$HOME/.m2":/root/.m2 \
-        //                     -w /app \
-        //                     -e SONAR_HOST_URL="${SONAR_HOST_URL}" \
-        //                     -e SONAR_TOKEN="${SONAR_AUTH_TOKEN}" \
-        //                     ${MAVEN_IMAGE} \
-        //                     mvn sonar:sonar \
-        //                         -Dsonar.projectKey=kevin_82_webapp \
-        //                         -Dsonar.organization=samson-jean \
-        //                         -Dsonar.host.url=${SONAR_HOST_URL} \
-        //                         -Dsonar.token=${SONAR_AUTH_TOKEN}
+        //             sh '''
+        //                 mvn sonar:sonar \
+        //                     -Dsonar.projectKey=kevin_82_webapp \
+        //                     -Dsonar.organization=samson-jean \
+        //                     -Dsonar.projectVersion=1.0 \
+        //                     -Dsonar.java.source=17
         //             '''
         //         }
-        //         echo 'FINISHED SONARQUBE ANALYSIS'
+        //         echo '========== FINISHED SONARQUBE ANALYSIS =========='
         //     }
         // }
+
 
         stage('Compilation') {
             agent {
@@ -171,7 +133,7 @@ pipeline {
                 echo '========== COMPILATION =========='
                 sh  'mvn package -DskipTests'
                 sh 'ls -la target/*.jar'
-                echo 'FINISHED COMPILATION'
+                echo '========== FINISHED COMPILATION =========='
             }
             post {
                 success {
@@ -180,13 +142,23 @@ pipeline {
             }
         }
 
-        // stage('Build Docker Image') {
-        //     steps {
-        //         script {
-        //             dockerImage = docker.build("${DOCKER_IMAGE}:${DOCKER_TAG}")
-        //         }
-        //     }
-        // }
+        stage('Build Docker Image') {
+            agent {
+                docker {
+                    image 'docker:24-cli'
+                    args '-v /var/run/docker.sock:/var/run/docker.sock'
+                    reuseNode true
+                }
+            }
+            steps {
+                echo '========== BUILD DOCKER IMAGE =========='
+                sh '''
+                    docker build -t ${DOCKER_IMAGE}:${DOCKER_TAG} .
+                    docker tag ${DOCKER_IMAGE}:${DOCKER_TAG} ${DOCKER_IMAGE}:latest
+                '''
+                echo '========== FINISHED BUILDING DOCKER IMAGE =========='
+            }
+        }
 
         // stage('Push to Registry') {
         //     steps {
