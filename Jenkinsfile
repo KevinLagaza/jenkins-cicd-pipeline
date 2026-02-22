@@ -187,14 +187,6 @@ pipeline {
 
         stage('Deploy to Staging') {
 
-            agent {
-                docker {
-                    image 'docker:24-cli'
-                    args '-v /var/run/docker.sock:/var/run/docker.sock'
-                    reuseNode true
-                }
-            }
-
             when {
                 expression { 
                     return env.GIT_BRANCH == 'origin/main'
