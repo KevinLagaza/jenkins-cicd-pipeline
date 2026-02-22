@@ -181,7 +181,9 @@ pipeline {
 
         stage('Deploy to Staging') {
             when {
-                branch 'main'
+                expression { 
+                    return env.GIT_BRANCH == 'origin/main' || env.GIT_BRANCH == 'main'
+                }
             }
             steps {
                 echo "========== DEPLOY TO STAGING =========="
