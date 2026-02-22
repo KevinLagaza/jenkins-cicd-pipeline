@@ -236,15 +236,22 @@ pipeline {
                 sshagent(credentials: ["${PRODUCTION_SSH_KEY}"]) {
                     sh """
                         ssh -o StrictHostKeyChecking=no ${SSH_USER}@${PRODUCTION_HOST} "
+
+                            echo "=== Pulling new image ===" &&
                             docker pull ${DOCKER_IMAGE}:${DOCKER_TAG} &&
-                            docker rm -f ${APP_NAME} || true &&
+
+                            echo "=== Stopping old container ===" &&
+                            docker stop ${APP_NAME} || true &&
+                            docker rm ${APP_NAME} || true &&
+
+                            echo "=== Starting new container ===" &&
                             docker run -d \
                                 --name ${APP_NAME} \
                                 -p ${APP_PORT}:${CONTAINER_PORT} \
                                 -e SPRING_PROFILES_ACTIVE=production \
                                 ${DOCKER_IMAGE}:${DOCKER_TAG} &&
                             sleep 10 &&
-                            docker ps | grep ${APP_NAME}
+                            docker ps
                         "
                     """
                 }
