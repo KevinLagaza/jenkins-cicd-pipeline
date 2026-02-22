@@ -31,7 +31,8 @@ pipeline {
             agent {
                 docker {
                     image 'maven:3.9.6-eclipse-temurin-17-alpine'
-                    args '-v $HOME/.m2:/root/.m2 -v /var/run/docker.sock:/var/run/docker.sock'
+                    args '-v $HOME/.m2:/root/.m2'
+                    reuseNode true
                 }
             }
             steps {
@@ -42,6 +43,12 @@ pipeline {
         }
 
         // stage('Unit Tests') {
+        //     agent {
+        //         docker {
+        //             image 'maven:3.9.6-eclipse-temurin-17-alpine'
+        //             args '-v $HOME/.m2:/root/.m2 -v /var/run/docker.sock:/var/run/docker.sock'
+        //         }
+        //     }
         //     steps {
         //         echo '========== UNIT TESTS =========='
         //         sh '''
