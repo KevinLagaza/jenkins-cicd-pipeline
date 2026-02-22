@@ -7,14 +7,25 @@ pipeline {
         DOCKER_IMAGE = 'kevinlagaza/${APP_NAME}'
         DOCKER_TAG = '${BUILD_NUMBER}'
         DOCKER_CREDENTIALS = 'dockerhub-credentials'
-        // Deployment
+
+        // AWS servers
         STAGING_HOST = credentials('staging-host') 
         PRODUCTION_HOST = credentials('production-host')
+
+        // SSH Configuration
         SSH_USER = 'ubuntu'
         STAGING_SSH_KEY = 'staging-ssh-key'
         PRODUCTION_SSH_KEY = 'production-ssh-key'
+
+        // Application Configuration
         CONTAINER_PORT = '8080'
         APP_PORT = '8080'
+
+        // Database Configuration
+        DB_CONTAINER_NAME = 'mysql-paymybuddy'
+        DB_PORT = '3306'
+        DB_ROOT_PASSWORD = 'password'
+        DB_NAME = 'paymybuddy'
     }
 
     stages {
@@ -196,6 +207,31 @@ pipeline {
                     sh """
                         ssh -o StrictHostKeyChecking=no ${SSH_USER}@${STAGING_HOST} "
 
+                            echo '=== Checking existing MySQL container ===' &&
+                            if docker ps -a | grep -q ${DB_CONTAINER_NAME}; then
+                                echo 'MySQL container exists, checking if running...' &&
+                                if ! docker ps | grep -q ${DB_CONTAINER_NAME}; then
+                                    echo 'Starting existing MySQL container...' &&
+                                    docker start ${DB_CONTAINER_NAME}
+                                else
+                                    echo 'MySQL container already running'
+                                fi
+                            else
+                                echo '=== Starting MySQL container ===' &&
+                                docker run -d \
+                                    --name ${DB_CONTAINER_NAME} \
+                                    -p ${DB_PORT}:3306 \
+                                    -e MYSQL_ROOT_PASSWORD=${DB_ROOT_PASSWORD} \
+                                    -e MYSQL_DATABASE=${DB_NAME} \
+                                    mysql:8.0 &&
+                                echo 'Waiting for MySQL to be ready...' &&
+                                sleep 30
+                            fi &&
+
+                            echo '=== Getting Docker bridge IP ===' &&
+                            DOCKER_IP=\\\$(docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' ${DB_CONTAINER_NAME}) &&
+                            echo \"MySQL IP: \\\$DOCKER_IP\" &&
+
                             echo "=== Pulling new image ===" &&
                             docker pull ${DOCKER_IMAGE}:${DOCKER_TAG} &&
 
@@ -208,11 +244,7 @@ pipeline {
                                 --name ${APP_NAME} \
                                 -p ${APP_PORT}:${CONTAINER_PORT} \
                                 -e SPRING_PROFILES_ACTIVE=staging \
-                                ${DOCKER_IMAGE}:${DOCKER_TAG} &&
-
-                            echo "=== Verifying deployment ===" &&
-                            sleep 10 &&
-                            docker ps | grep ${APP_NAME}
+                                ${DOCKER_IMAGE}:${DOCKER_TAG}
                         "
                     """
                 }
