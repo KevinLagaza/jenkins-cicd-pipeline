@@ -62,25 +62,25 @@ pipeline {
             }
         }
 
-        // stage('Integration Tests') {
-        //     steps {
-        //         echo '========== INTEGRATION TESTS =========='
-        //         sh '''
-        //             docker run --rm \
-        //                 -v \$(pwd):/app \
-        //                 -v \$HOME/.m2:/root/.m2 \
-        //                 -w /app \
-        //                 ${MAVEN_IMAGE} \
-        //                 mvn verify -Dtest=*IT -DfailIfNoTests=false
-        //         '''
-        //         echo '========== FINISHED INTEGRATION TESTS =========='
-        //     }
-        //     post {
-        //         always {
-        //             junit allowEmptyResults: true, testResults: '**/target/failsafe-reports/*.xml'
-        //         }
-        //     }
-        // }
+        stage('Integration Tests') {
+            agent {
+                docker {
+                    image 'maven:3.9.6-eclipse-temurin-17-alpine'
+                    args '-v $HOME/.m2:/root/.m2'
+                    reuseNode true
+                }
+            }
+            steps {
+                echo '========== INTEGRATION TESTS =========='
+                sh 'mvn verify -Dtest=*IT -DfailIfNoTests=false'
+                echo '========== FINISHED INTEGRATION TESTS =========='
+            }
+            post {
+                always {
+                    junit allowEmptyResults: true, testResults: '**/target/failsafe-reports/*.xml'
+                }
+            }
+        }
 
         // stage ('Checkstyle Code Analysis'){
         //     steps {
