@@ -10,7 +10,7 @@ pipeline {
         // Deployment
         STAGING_HOST = credentials('staging-host') 
         PRODUCTION_HOST = credentials('production-host')
-        SSH_USER = ubuntu
+        SSH_USER = 'ubuntu'
         // SSH_USER = credentials('ssh-user')
         STAGING_SSH_KEY = 'staging-ssh-key'
         PRODUCTION_SSH_KEY = 'production-ssh-key'
