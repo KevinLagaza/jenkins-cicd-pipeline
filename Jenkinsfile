@@ -232,6 +232,20 @@ pipeline {
                             DOCKER_IP=\\\$(docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' ${DB_CONTAINER_NAME}) &&
                             echo \"MySQL IP: \\\$DOCKER_IP\" &&
 
+                            echo '=== Waiting for MySQL to accept connections ===' &&
+                            for i in 1 2 3 4 5 6 7 8 9 10; do
+                                if docker exec ${DB_CONTAINER_NAME} mysql -u root -p${DB_ROOT_PASSWORD} -e 'SELECT 1' 2>/dev/null; then
+                                    echo 'MySQL is ready!'
+                                    break
+                                fi
+                                echo \"Waiting for MySQL... attempt \\\$i/10\"
+                                sleep 5
+                            done &&
+                            
+                            echo '=== Executing SQL scripts ===' &&
+                            docker exec -i ${DB_CONTAINER_NAME} mysql -u root -p${DB_ROOT_PASSWORD} < /tmp/create.sql &&
+                            docker exec -i ${DB_CONTAINER_NAME} mysql -u root -p${DB_ROOT_PASSWORD} ${DB_NAME} < /tmp/data.sql &&
+
                             echo "=== Pulling new image ===" &&
                             docker pull ${DOCKER_IMAGE}:${DOCKER_TAG} &&
 
