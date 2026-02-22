@@ -97,88 +97,88 @@ pipeline {
         //     }
         // }
 
-        // stage('Build') {
-        //     agent {
-        //         docker {
-        //             image "${MAVEN_IMAGE}"
-        //             args '-v $HOME/.m2:/root/.m2'
-        //             reuseNode true
-        //         }
-        //     }
-        //     steps {
-        //         echo '========== BUILD =========='
-        //         sh 'mvn clean compile -DskipTests'
-        //         echo '========== FINISHED BUILD =========='
-        //     }
-        // }
+        stage('Build') {
+            agent {
+                docker {
+                    image "${MAVEN_IMAGE}"
+                    args '-v $HOME/.m2:/root/.m2'
+                    reuseNode true
+                }
+            }
+            steps {
+                echo '========== BUILD =========='
+                sh 'mvn clean compile -DskipTests'
+                echo '========== FINISHED BUILD =========='
+            }
+        }
 
-        // stage('Compilation') {
-        //     agent {
-        //         docker {
-        //             image "${MAVEN_IMAGE}"
-        //             args '-v $HOME/.m2:/root/.m2'
-        //             reuseNode true
-        //         }
-        //     }
-        //     steps {
-        //         echo '========== COMPILATION =========='
-        //         sh  'mvn package -DskipTests'
-        //         sh 'ls -la target/*.jar'
-        //         echo '========== FINISHED COMPILATION =========='
-        //     }
-        //     post {
-        //         success {
-        //             archiveArtifacts artifacts: 'target/*.jar', fingerprint: true
-        //         }
-        //     }
-        // }
+        stage('Compilation') {
+            agent {
+                docker {
+                    image "${MAVEN_IMAGE}"
+                    args '-v $HOME/.m2:/root/.m2'
+                    reuseNode true
+                }
+            }
+            steps {
+                echo '========== COMPILATION =========='
+                sh  'mvn package -DskipTests'
+                sh 'ls -la target/*.jar'
+                echo '========== FINISHED COMPILATION =========='
+            }
+            post {
+                success {
+                    archiveArtifacts artifacts: 'target/*.jar', fingerprint: true
+                }
+            }
+        }
 
-        // stage('Build Docker Image') {
-        //     agent {
-        //         docker {
-        //             image 'docker:24-cli'
-        //             args '-v /var/run/docker.sock:/var/run/docker.sock'
-        //             reuseNode true
-        //         }
-        //     }
-        //     steps {
-        //         echo '========== BUILD DOCKER IMAGE =========='
-        //         sh "docker build -t ${DOCKER_IMAGE}:${DOCKER_TAG} ."
-        //         echo '========== FINISHED BUILDING DOCKER IMAGE =========='
-        //     }
-        // }
+        stage('Build Docker Image') {
+            agent {
+                docker {
+                    image 'docker:24-cli'
+                    args '-v /var/run/docker.sock:/var/run/docker.sock'
+                    reuseNode true
+                }
+            }
+            steps {
+                echo '========== BUILD DOCKER IMAGE =========='
+                sh "docker build -t ${DOCKER_IMAGE}:${DOCKER_TAG} ."
+                echo '========== FINISHED BUILDING DOCKER IMAGE =========='
+            }
+        }
 
-        // stage('Push Docker Image') {
-        //     agent {
-        //         docker {
-        //             image 'docker:24-cli'
-        //             args '-v /var/run/docker.sock:/var/run/docker.sock'
-        //             reuseNode true
-        //         }
-        //     }
-        //     steps {
-        //         echo "========== PUSH DOCKER IMAGE =========="
-        //         withCredentials([usernamePassword(
-        //             credentialsId: "${DOCKER_CREDENTIALS}",
-        //             usernameVariable: 'DOCKER_USER',
-        //             passwordVariable: 'DOCKER_PASS'
-        //         )]) {
-        //             sh """
-        //                 echo \$DOCKER_PASS | docker login -u \$DOCKER_USER --password-stdin
-        //                 docker push ${DOCKER_IMAGE}:${DOCKER_TAG}
-        //                 docker rmi ${DOCKER_IMAGE}:${DOCKER_TAG} || true
-        //                 docker logout
-        //             """
-        //         }
-        //         echo "========== FINISHED PUSHING DOCKER IMAGE =========="
-        //     }
-        // }
+        stage('Push Docker Image') {
+            agent {
+                docker {
+                    image 'docker:24-cli'
+                    args '-v /var/run/docker.sock:/var/run/docker.sock'
+                    reuseNode true
+                }
+            }
+            steps {
+                echo "========== PUSH DOCKER IMAGE =========="
+                withCredentials([usernamePassword(
+                    credentialsId: "${DOCKER_CREDENTIALS}",
+                    usernameVariable: 'DOCKER_USER',
+                    passwordVariable: 'DOCKER_PASS'
+                )]) {
+                    sh """
+                        echo \$DOCKER_PASS | docker login -u \$DOCKER_USER --password-stdin
+                        docker push ${DOCKER_IMAGE}:${DOCKER_TAG}
+                        docker rmi ${DOCKER_IMAGE}:${DOCKER_TAG} || true
+                        docker logout
+                    """
+                }
+                echo "========== FINISHED PUSHING DOCKER IMAGE =========="
+            }
+        }
 
-        // stage('Cleanup') {
-        //     steps {
-        //         sh "docker rmi ${DOCKER_IMAGE}:${DOCKER_TAG} || true"
-        //     }
-        // }
+        stage('Cleanup') {
+            steps {
+                sh "docker rmi ${DOCKER_IMAGE}:${DOCKER_TAG} || true"
+            }
+        }
 
         stage('Deploy to Staging') {
 
