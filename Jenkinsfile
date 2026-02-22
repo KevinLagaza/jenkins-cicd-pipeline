@@ -193,8 +193,7 @@ pipeline {
                     sh """
                         ssh -o StrictHostKeyChecking=no ${SSH_USER}@${STAGING_HOST} '
                             docker pull ${DOCKER_IMAGE}:${DOCKER_TAG} &&
-                            docker stop ${APP_NAME} || true &&
-                            docker rm ${APP_NAME} || true &&
+                            docker rm -f ${APP_NAME} || true &&
                             docker run -d \
                                 --name ${APP_NAME} \
                                 -p ${APP_PORT}:${CONTAINER_PORT} \
@@ -230,8 +229,7 @@ pipeline {
                     sh """
                         ssh -o StrictHostKeyChecking=no ${SSH_USER}@${PRODUCTION_HOST} '
                             docker pull ${DOCKER_IMAGE}:${DOCKER_TAG} &&
-                            docker stop ${APP_NAME} || true &&
-                            docker rm ${APP_NAME} || true &&
+                            docker rm -f ${APP_NAME} || true &&
                             docker run -d \
                                 --name ${APP_NAME} \
                                 -p ${APP_PORT}:${CONTAINER_PORT} \
