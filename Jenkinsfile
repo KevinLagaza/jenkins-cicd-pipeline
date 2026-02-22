@@ -197,7 +197,6 @@ pipeline {
                             docker run -d \
                                 --name ${APP_NAME} \
                                 -p ${APP_PORT}:${CONTAINER_PORT} \
-                                --restart unless-stopped \
                                 -e SPRING_PROFILES_ACTIVE=staging \
                                 ${DOCKER_IMAGE}:${DOCKER_TAG} &&
                             sleep 10 &&
@@ -233,7 +232,6 @@ pipeline {
                             docker run -d \
                                 --name ${APP_NAME} \
                                 -p ${APP_PORT}:${CONTAINER_PORT} \
-                                --restart unless-stopped \
                                 -e SPRING_PROFILES_ACTIVE=production \
                                 ${DOCKER_IMAGE}:${DOCKER_TAG} &&
                             sleep 10 &&
