@@ -127,21 +127,21 @@ pipeline {
             }
         }
 
-        stage('Build Docker Image') {
-            agent {
-                docker {
-                    image 'docker:24-cli'
-                    args '-v /var/run/docker.sock:/var/run/docker.sock'
-                    reuseNode true
-                }
-            }
-            steps {
-                echo '========== BUILD DOCKER IMAGE =========='
-                sh 'ls -al'
-                sh 'docker build -t $DOCKER_IMAGE:$DOCKER_TAG .'
-                echo '========== FINISHED BUILDING DOCKER IMAGE =========='
-            }
-        }
+        // stage('Build Docker Image') {
+        //     agent {
+        //         docker {
+        //             image 'docker:24-cli'
+        //             args '-v /var/run/docker.sock:/var/run/docker.sock'
+        //             reuseNode true
+        //         }
+        //     }
+        //     steps {
+        //         echo '========== BUILD DOCKER IMAGE =========='
+        //         sh 'ls -al'
+        //         sh 'docker build -t $DOCKER_IMAGE:$DOCKER_TAG .'
+        //         echo '========== FINISHED BUILDING DOCKER IMAGE =========='
+        //     }
+        // }
 
 
         // stage('Deploy to Production') {
