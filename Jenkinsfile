@@ -12,24 +12,10 @@ pipeline {
 
     stages {
 
-        // stage('Checkout') {
-        //     steps {
-        //         // Clean workspace before checkout
-        //         cleanWs()
-                
-        //         // Explicit checkout
-        //         checkout scm
-                
-        //         // Verify checkout
-        //         sh 'ls -la'
-        //         sh 'git status'
-        //     }
-        // }
-
         stage('Build') {
             agent {
                 docker {
-                    image '${MAVEN_IMAGE}'
+                    image '$MAVEN_IMAGE'
                     args '-v $HOME/.m2:/root/.m2'
                     reuseNode true
                 }
@@ -44,7 +30,7 @@ pipeline {
         // stage('Unit Tests') {
         //     agent {
         //         docker {
-        //             image '${MAVEN_IMAGE}'
+        //             image '$MAVEN_IMAGE'
         //             args '-v $HOME/.m2:/root/.m2'
         //             reuseNode true
         //         }
@@ -64,7 +50,7 @@ pipeline {
         // stage('Integration Tests') {
         //     agent {
         //         docker {
-        //             image '${MAVEN_IMAGE}'
+        //             image '$MAVEN_IMAGE'
         //             args '-v $HOME/.m2:/root/.m2'
         //             reuseNode true
         //         }
@@ -84,7 +70,7 @@ pipeline {
         stage ('Checkstyle Code Analysis'){
             agent {
                 docker {
-                    image '${MAVEN_IMAGE}'
+                    image '$MAVEN_IMAGE'
                     args '-v $HOME/.m2:/root/.m2'
                     reuseNode true
                 }
@@ -99,7 +85,7 @@ pipeline {
         // stage('SonarQube Analysis') {
         //     agent {
         //         docker {
-        //             image '${MAVEN_IMAGE}'
+        //             image '$MAVEN_IMAGE'
         //             args '-v $HOME/.m2:/root/.m2'
         //             reuseNode true
         //         }
@@ -123,7 +109,7 @@ pipeline {
         stage('Compilation') {
             agent {
                 docker {
-                    image '${MAVEN_IMAGE}'
+                    image '$MAVEN_IMAGE'
                     args '-v $HOME/.m2:/root/.m2'
                     reuseNode true
                 }
@@ -152,7 +138,7 @@ pipeline {
             steps {
                 echo '========== BUILD DOCKER IMAGE =========='
                 sh 'ls -al'
-                sh 'docker build -t ${DOCKER_IMAGE}:${DOCKER_TAG} .'
+                sh 'docker build -t $DOCKER_IMAGE:$DOCKER_TAG .'
                 echo '========== FINISHED BUILDING DOCKER IMAGE =========='
             }
         }
