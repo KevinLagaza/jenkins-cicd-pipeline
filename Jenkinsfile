@@ -253,7 +253,7 @@ pipeline {
                             docker stop ${APP_NAME} || true &&
                             docker rm ${APP_NAME} || true &&
 
-                            echo "=== Starting new container ===" &&
+                            echo "=== Starting application container ===" &&
                             docker run -d \
                                 --name ${APP_NAME} \
                                 -p ${APP_PORT}:${CONTAINER_PORT} \
