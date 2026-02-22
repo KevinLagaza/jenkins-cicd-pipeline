@@ -114,9 +114,6 @@ pipeline {
                             -Dsonar.projectKey=kevin_82_webapp \
                             -Dsonar.organization=samson-jean \
                             -Dsonar.projectVersion=1.0 \
-                            // -Dsonar.sources=src/java \
-                            // -Dsonar.tests=src/test \
-                            -Dsonar.java.binaries=target/classes \
                             -Dsonar.java.source=17
                     '''
                 }
