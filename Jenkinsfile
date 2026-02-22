@@ -8,12 +8,11 @@ pipeline {
         DOCKER_TAG = '${BUILD_NUMBER}'
         DOCKER_CREDENTIALS = 'dockerhub-credentials'
         // Deployment
-        STAGING_HOST = credentials("staging-host") 
-        PRODUCTION_HOST = credentials("production-host")
-        SSH_USER = "ubuntu"
-        // SSH_USER = credentials('ssh-user')
-        STAGING_SSH_KEY = "staging-ssh-key"
-        PRODUCTION_SSH_KEY = "production-ssh-key"
+        STAGING_HOST = credentials('staging-host') 
+        PRODUCTION_HOST = credentials('production-host')
+        SSH_USER = 'ubuntu'
+        STAGING_SSH_KEY = 'staging-ssh-key'
+        PRODUCTION_SSH_KEY = 'production-ssh-key'
         CONTAINER_PORT = '8080'
         APP_PORT = '8080'
     }
@@ -190,44 +189,23 @@ pipeline {
             }
             steps {
                 echo "========== DEPLOY TO STAGING =========="
-                withCredentials([sshUserPrivateKey(
-                    credentialsId: 'staging-ssh-key',
-                    keyFileVariable: 'SSH_KEY_FILE',
-                    usernameVariable: 'SSH_USERNAME'
-                )]) {
-                    sh '''
-                        chmod 600 $SSH_KEY_FILE
-                        ssh -i $SSH_KEY_FILE -o StrictHostKeyChecking=no $SSH_USERNAME@''' + "${STAGING_HOST}" + ''' "
-                            docker pull ''' + "${DOCKER_IMAGE}:${DOCKER_TAG}" + ''' &&
-                            docker stop ''' + "${APP_NAME}" + ''' || true &&
-                            docker rm ''' + "${APP_NAME}" + ''' || true &&
+                sshagent(credentials: ["${STAGING_SSH_KEY}"]) {
+                    sh """
+                        ssh -o StrictHostKeyChecking=no ${SSH_USER}@${STAGING_HOST} '
+                            docker pull ${DOCKER_IMAGE}:${DOCKER_TAG} &&
+                            docker stop ${APP_NAME} || true &&
+                            docker rm ${APP_NAME} || true &&
                             docker run -d \
-                                --name ''' + "${APP_NAME}" + ''' \
-                                -p ''' + "${APP_PORT}:${CONTAINER_PORT}" + ''' \
+                                --name ${APP_NAME} \
+                                -p ${APP_PORT}:${CONTAINER_PORT} \
                                 --restart unless-stopped \
-                                ''' + "${DOCKER_IMAGE}:${DOCKER_TAG}" + '''
-                        "
-                    '''
+                                -e SPRING_PROFILES_ACTIVE=staging \
+                                ${DOCKER_IMAGE}:${DOCKER_TAG} &&
+                            sleep 10 &&
+                            docker ps | grep ${APP_NAME}
+                        '
+                    """
                 }
-
-
-                // sshagent(credentials: ["${STAGING_SSH_KEY}"]) {
-                //     sh """
-                //         ssh -o StrictHostKeyChecking=no ${SSH_USER}@${STAGING_HOST} '
-                //             docker pull ${DOCKER_IMAGE}:${DOCKER_TAG} &&
-                //             docker stop ${APP_NAME} || true &&
-                //             docker rm ${APP_NAME} || true &&
-                //             docker run -d \
-                //                 --name ${APP_NAME} \
-                //                 -p ${APP_PORT}:${CONTAINER_PORT} \
-                //                 --restart unless-stopped \
-                //                 -e SPRING_PROFILES_ACTIVE=staging \
-                //                 ${DOCKER_IMAGE}:${DOCKER_TAG} &&
-                //             sleep 10 &&
-                //             docker ps | grep ${APP_NAME}
-                //         '
-                //     """
-                // }
             }
             post {
                 success {
@@ -235,6 +213,43 @@ pipeline {
                 }
                 failure {
                     echo "❌ Staging deployment failed!"
+                }
+            }
+        }
+
+        stage('Deploy to Production') {
+
+            when {
+                expression { 
+                    return env.GIT_BRANCH == 'origin/main'
+                }
+            }
+            steps {
+                echo "========== DEPLOY TO PRODUCTION =========="
+                sshagent(credentials: ["${PRODUCTION_SSH_KEY}"]) {
+                    sh """
+                        ssh -o StrictHostKeyChecking=no ${SSH_USER}@${PRODUCTION_HOST} '
+                            docker pull ${DOCKER_IMAGE}:${DOCKER_TAG} &&
+                            docker stop ${APP_NAME} || true &&
+                            docker rm ${APP_NAME} || true &&
+                            docker run -d \
+                                --name ${APP_NAME} \
+                                -p ${APP_PORT}:${CONTAINER_PORT} \
+                                --restart unless-stopped \
+                                -e SPRING_PROFILES_ACTIVE=production \
+                                ${DOCKER_IMAGE}:${DOCKER_TAG} &&
+                            sleep 10 &&
+                            docker ps | grep ${APP_NAME}
+                        '
+                    """
+                }
+            }
+            post {
+                success {
+                    echo "✅ Production deployment successful!"
+                }
+                failure {
+                    echo "❌ Production deployment failed!"
                 }
             }
         }

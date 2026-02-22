@@ -29,15 +29,17 @@ a) Install the following plugins:
 
 * Docker Pipeline
 * SonarQube Scanner (for static code analysis)
-* Slack Notification (for notification)
 * SSH Agent (for deployment)
+* Slack Notification (for notification)
 
-b) Add dockerhub and sonarcloud credentials
+
+b) Add **dockerhub** and **sonarcloud** credentials under Global scope
 
 **![Dockerhub credentials](./images/prerequisites/dockerhub-cred.png)**
 
 **![Sonar token](./images/prerequisites/sonar-in-jenkins.png)**
 
+c) Add **STAGING_SSH_KEY** and **PRODUCTION_SSH_KEY** credentials under Jenkins scope
 
 ## 1) Automated testing
 
