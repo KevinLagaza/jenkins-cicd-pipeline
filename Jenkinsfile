@@ -199,32 +199,32 @@ pipeline {
                     sh """
                         ssh -o StrictHostKeyChecking=no ${SSH_USER}@${STAGING_HOST} "
 
-                            echo '=== Checking existing MySQL container ===' &&
+                            echo "=== Checking existing MySQL container ===" &&
                             if docker ps -a | grep -q ${DB_CONTAINER_NAME}; then
-                                echo 'MySQL container exists, checking if running...' &&
+                                echo "MySQL container exists, checking if running..." &&
                                 if ! docker ps | grep -q ${DB_CONTAINER_NAME}; then
-                                    echo 'Starting existing MySQL container...' &&
+                                    echo "Starting existing MySQL container..." &&
                                     docker start ${DB_CONTAINER_NAME}
                                 else
-                                    echo 'MySQL container already running'
+                                    echo "MySQL container already running"
                                 fi
                             else
-                                echo '=== Starting MySQL container ===' &&
+                                echo "=== Starting MySQL container ===" &&
                                 docker run -d \
                                     --name ${DB_CONTAINER_NAME} \
                                     -p ${DB_PORT}:3306 \
                                     -e MYSQL_ROOT_PASSWORD=${DB_ROOT_PASSWORD} \
                                     -e MYSQL_DATABASE=${DB_NAME} \
                                     mysql:8.0 &&
-                                echo 'Waiting for MySQL to be ready...' &&
+                                echo "Waiting for MySQL to be ready..." &&
                                 sleep 30
                             fi &&
 
-                            echo '=== Getting Docker bridge IP ===' &&
-                            DOCKER_IP=\\\$(docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' ${DB_CONTAINER_NAME}) &&
+                            echo "=== Getting Docker bridge IP ===" &&
+                            DOCKER_IP=\\\$(docker inspect -f "{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}" ${DB_CONTAINER_NAME}) &&
                             echo \"MySQL IP: \\\$DOCKER_IP\" &&
                             
-                            echo '=== Executing SQL scripts ===' &&
+                            echo "=== Executing SQL scripts ===" &&
                             docker exec -i ${DB_CONTAINER_NAME} mysql -u root -p${DB_ROOT_PASSWORD} < /tmp/create.sql &&
                             docker exec -i ${DB_CONTAINER_NAME} mysql -u root -p${DB_ROOT_PASSWORD} ${DB_NAME} < /tmp/data.sql &&
 
