@@ -4,8 +4,8 @@ pipeline {
     environment {
         APP_NAME = 'paymybuddy'
         MAVEN_IMAGE = 'maven:3.9.6-eclipse-temurin-17-alpine'
-        DOCKER_IMAGE = 'kevinlagaza/${APP_NAME}'
-        DOCKER_TAG = '${BUILD_NUMBER}'
+        DOCKER_IMAGE = 'kevinlagaza/$APP_NAME'
+        DOCKER_TAG = '$BUILD_NUMBER'
         REGISTRY_URL = 'https://index.docker.io/v1/'
         DOCKER_CREDENTIALS = 'dockerhub-credentials'
     }
