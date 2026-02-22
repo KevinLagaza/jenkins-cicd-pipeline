@@ -15,7 +15,7 @@ pipeline {
         stage('Build') {
             agent {
                 docker {
-                    image ${MAVEN_IMAGE}
+                    image "${MAVEN_IMAGE}"
                     args '-v $HOME/.m2:/root/.m2'
                     reuseNode true
                 }
@@ -109,7 +109,7 @@ pipeline {
         stage('Compilation') {
             agent {
                 docker {
-                    image ${MAVEN_IMAGE}
+                    image "${MAVEN_IMAGE}"
                     args '-v $HOME/.m2:/root/.m2'
                     reuseNode true
                 }
