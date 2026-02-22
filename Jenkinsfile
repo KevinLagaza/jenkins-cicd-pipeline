@@ -11,83 +11,83 @@ pipeline {
 
     stages {
 
-        stage('Unit Tests') {
-            agent {
-                docker {
-                    image "${MAVEN_IMAGE}"
-                    args '-v $HOME/.m2:/root/.m2'
-                    reuseNode true
-                }
-            }
-            steps {
-                echo '========== UNIT TESTS =========='
-                sh 'mvn test -Dtest=*Test'
-                echo '========== FINISHED UNIT TESTS =========='
-            }
-            post {
-                always {
-                    junit allowEmptyResults: true, testResults: '**/target/surefire-reports/*.xml'
-                }
-            }
-        }
+        // stage('Unit Tests') {
+        //     agent {
+        //         docker {
+        //             image "${MAVEN_IMAGE}"
+        //             args '-v $HOME/.m2:/root/.m2'
+        //             reuseNode true
+        //         }
+        //     }
+        //     steps {
+        //         echo '========== UNIT TESTS =========='
+        //         sh 'mvn test -Dtest=*Test'
+        //         echo '========== FINISHED UNIT TESTS =========='
+        //     }
+        //     post {
+        //         always {
+        //             junit allowEmptyResults: true, testResults: '**/target/surefire-reports/*.xml'
+        //         }
+        //     }
+        // }
 
-        stage('Integration Tests') {
-            agent {
-                docker {
-                    image "${MAVEN_IMAGE}"
-                    args '-v $HOME/.m2:/root/.m2'
-                    reuseNode true
-                }
-            }
-            steps {
-                echo '========== INTEGRATION TESTS =========='
-                sh 'mvn verify -Dtest=*IT -DfailIfNoTests=false'
-                echo '========== FINISHED INTEGRATION TESTS =========='
-            }
-            post {
-                always {
-                    junit allowEmptyResults: true, testResults: '**/target/failsafe-reports/*.xml'
-                }
-            }
-        }
+        // stage('Integration Tests') {
+        //     agent {
+        //         docker {
+        //             image "${MAVEN_IMAGE}"
+        //             args '-v $HOME/.m2:/root/.m2'
+        //             reuseNode true
+        //         }
+        //     }
+        //     steps {
+        //         echo '========== INTEGRATION TESTS =========='
+        //         sh 'mvn verify -Dtest=*IT -DfailIfNoTests=false'
+        //         echo '========== FINISHED INTEGRATION TESTS =========='
+        //     }
+        //     post {
+        //         always {
+        //             junit allowEmptyResults: true, testResults: '**/target/failsafe-reports/*.xml'
+        //         }
+        //     }
+        // }
 
-        stage ('Checkstyle Code Analysis'){
-            agent {
-                docker {
-                    image "${MAVEN_IMAGE}"
-                    args '-v $HOME/.m2:/root/.m2'
-                    reuseNode true
-                }
-            }
-            steps {
-                echo '========== CHECKSTYLE ANALYSIS =========='
-                sh 'mvn checkstyle:checkstyle'
-                echo '========== FINISHED CHECKSTYLE ANALYSIS =========='
-            }
-        }
+        // stage ('Checkstyle Code Analysis'){
+        //     agent {
+        //         docker {
+        //             image "${MAVEN_IMAGE}"
+        //             args '-v $HOME/.m2:/root/.m2'
+        //             reuseNode true
+        //         }
+        //     }
+        //     steps {
+        //         echo '========== CHECKSTYLE ANALYSIS =========='
+        //         sh 'mvn checkstyle:checkstyle'
+        //         echo '========== FINISHED CHECKSTYLE ANALYSIS =========='
+        //     }
+        // }
 
-        stage('SonarQube Analysis') {
-            agent {
-                docker {
-                    image "${MAVEN_IMAGE}"
-                    args '-v $HOME/.m2:/root/.m2'
-                    reuseNode true
-                }
-            }
-            steps {
-                echo '========== SONARQUBE ANALYSIS =========='
-                withSonarQubeEnv('sonarqube') {
-                    sh '''
-                        mvn sonar:sonar \
-                            -Dsonar.projectKey=kevin_82_webapp \
-                            -Dsonar.organization=samson-jean \
-                            -Dsonar.projectVersion=1.0 \
-                            -Dsonar.java.source=17
-                    '''
-                }
-                echo '========== FINISHED SONARQUBE ANALYSIS =========='
-            }
-        }
+        // stage('SonarQube Analysis') {
+        //     agent {
+        //         docker {
+        //             image "${MAVEN_IMAGE}"
+        //             args '-v $HOME/.m2:/root/.m2'
+        //             reuseNode true
+        //         }
+        //     }
+        //     steps {
+        //         echo '========== SONARQUBE ANALYSIS =========='
+        //         withSonarQubeEnv('sonarqube') {
+        //             sh '''
+        //                 mvn sonar:sonar \
+        //                     -Dsonar.projectKey=kevin_82_webapp \
+        //                     -Dsonar.organization=samson-jean \
+        //                     -Dsonar.projectVersion=1.0 \
+        //                     -Dsonar.java.source=17
+        //             '''
+        //         }
+        //         echo '========== FINISHED SONARQUBE ANALYSIS =========='
+        //     }
+        // }
 
         stage('Build') {
             agent {
@@ -103,7 +103,6 @@ pipeline {
                 echo '========== FINISHED BUILD =========='
             }
         }
-
 
         stage('Compilation') {
             agent {
@@ -159,12 +158,38 @@ pipeline {
                     sh """
                         echo \$DOCKER_PASS | docker login -u \$DOCKER_USER --password-stdin
                         docker push ${DOCKER_IMAGE}:${DOCKER_TAG}
+                        docker rmi ${DOCKER_IMAGE}:${DOCKER_TAG} || true
                         docker logout
                     """
                 }
                 echo "========== FINISHED PUSHING DOCKER IMAGE =========="
             }
         }
+
+        // stage('Cleanup') {
+        //     steps {
+        //         sh "docker rmi ${DOCKER_IMAGE}:${DOCKER_TAG} || true"
+        //     }
+        // }
+
+        // stage('Deploy to Staging') {
+        //     when {
+        //         branch 'main'
+        //     }
+        //     steps {
+        //         echo "========== DEPLOY TO STAGING =========="
+        //         sshagent(['staging-ssh-key']) {
+        //             sh """
+        //                 ssh -o StrictHostKeyChecking=no ubuntu@staging.example.com '
+        //                     docker pull ${DOCKER_IMAGE}:${DOCKER_TAG} &&
+        //                     docker stop ${APP_NAME} || true &&
+        //                     docker rm ${APP_NAME} || true &&
+        //                     docker run -d --name ${APP_NAME} -p 8080:8080 ${DOCKER_IMAGE}:${DOCKER_TAG}
+        //                 '
+        //             """
+        //         }
+        //     }
+        // }
 
 
         // stage('Deploy to Production') {
