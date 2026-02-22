@@ -42,31 +42,25 @@ pipeline {
             }
         }
 
-        // stage('Unit Tests') {
-        //     agent {
-        //         docker {
-        //             image 'maven:3.9.6-eclipse-temurin-17-alpine'
-        //             args '-v $HOME/.m2:/root/.m2 -v /var/run/docker.sock:/var/run/docker.sock'
-        //         }
-        //     }
-        //     steps {
-        //         echo '========== UNIT TESTS =========='
-        //         sh '''
-        //             docker run --rm \
-        //                 -v \$(pwd):/app \
-        //                 -v \$HOME/.m2:/root/.m2 \
-        //                 -w /app \
-        //                 ${MAVEN_IMAGE} \
-        //                 mvn test -Dtest=*Test
-        //         '''
-        //         echo '========== FINISHED UNIT TESTS =========='
-        //     }
-        //     post {
-        //         always {
-        //             junit allowEmptyResults: true, testResults: '**/target/surefire-reports/*.xml'
-        //         }
-        //     }
-        // }
+        stage('Unit Tests') {
+            agent {
+                docker {
+                    image 'maven:3.9.6-eclipse-temurin-17-alpine'
+                    args '-v $HOME/.m2:/root/.m2'
+                    reuseNode true
+                }
+            }
+            steps {
+                echo '========== UNIT TESTS =========='
+                sh 'mvn test -Dtest=*Test'
+                echo '========== FINISHED UNIT TESTS =========='
+            }
+            post {
+                always {
+                    junit allowEmptyResults: true, testResults: '**/target/surefire-reports/*.xml'
+                }
+            }
+        }
 
         // stage('Integration Tests') {
         //     steps {
