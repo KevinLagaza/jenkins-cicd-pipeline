@@ -27,9 +27,7 @@ Create a sonarcloud account and generate a token that will be used in Jenkins.
 ---
 a) Install the following plugins:
 
-* Docker
 * Docker Pipeline
-* JUnit (for tests)
 * SonarQube Scanner (for static code analysis)
 * Slack Notification (for notification)
 * SSH Agent (for deployment)
@@ -45,8 +43,7 @@ b) Add dockerhub and sonarcloud credentials
 
 We will execute unitary and integration tests.
 
-```
-```
+**![Tests](./images/tests/tests_success.png)**
 
 ***
 
@@ -54,9 +51,18 @@ We will execute unitary and integration tests.
 
 We want to perform a static analysis of the code using SonarCloud. First, make sure to add the sonar token (done in the prerequisites' section) in the global credentials.  
 
-## 3) Compilation and Packaging quality
+**![Sonarqube](./images/security/sonarqube_success.png)**
 
-Now, we want to build the jar file, then the docker image and push the latter into DockerHub.
+**![Sonarqube results](./images/security/sonarqube_results.png)**
+
+## 3) Compilation and Packaging
+
+Now, we want to build the jar file, then build the docker image and push the latter into DockerHub.
+
+**![Build](./images/docker/build_success.png)**
+
+**![Dockerhub](./images/docker/dockerhub_image.png)**
+
 
 ## 4) Deployment in staging environment
 
