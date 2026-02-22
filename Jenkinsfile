@@ -181,61 +181,42 @@ pipeline {
         //     }
         // }
 
-        stage('Test SSH Credential') {
+        stage('Deploy to Staging') {
+
+            when {
+                expression { 
+                    return env.GIT_BRANCH == 'origin/main'
+                }
+            }
             steps {
-                script {
-                    try {
-                        withCredentials([sshUserPrivateKey(
-                            credentialsId: "${STAGING_SSH_KEY}",
-                            keyFileVariable: 'SSH_KEY_FILE',
-                            usernameVariable: 'SSH_USERNAME'
-                        )]) {
-                            echo "✅ Credential '${STAGING_SSH_KEY}' found!"
-                            echo "Username: ${SSH_USERNAME}"
-                        }
-                    } catch (Exception e) {
-                        error "❌ Credential '${STAGING_SSH_KEY}' not found! Please create it in Jenkins."
-                    }
+                echo "========== DEPLOY TO STAGING =========="
+                sshagent(credentials: ["${STAGING_SSH_KEY}"]) {
+                    sh """
+                        ssh -o StrictHostKeyChecking=no ${SSH_USER}@${STAGING_HOST} '
+                            docker pull ${DOCKER_IMAGE}:${DOCKER_TAG} &&
+                            docker stop ${APP_NAME} || true &&
+                            docker rm ${APP_NAME} || true &&
+                            docker run -d \
+                                --name ${APP_NAME} \
+                                -p ${APP_PORT}:${CONTAINER_PORT} \
+                                --restart unless-stopped \
+                                -e SPRING_PROFILES_ACTIVE=staging \
+                                ${DOCKER_IMAGE}:${DOCKER_TAG} &&
+                            sleep 10 &&
+                            docker ps | grep ${APP_NAME}
+                        '
+                    """
+                }
+            }
+            post {
+                success {
+                    echo "✅ Staging deployment successful!"
+                }
+                failure {
+                    echo "❌ Staging deployment failed!"
                 }
             }
         }
-
-        // stage('Deploy to Staging') {
-
-        //     when {
-        //         expression { 
-        //             return env.GIT_BRANCH == 'origin/main'
-        //         }
-        //     }
-        //     steps {
-        //         echo "========== DEPLOY TO STAGING =========="
-        //         sshagent(credentials: ["${STAGING_SSH_KEY}"]) {
-        //             sh """
-        //                 ssh -o StrictHostKeyChecking=no ${SSH_USER}@${STAGING_HOST} '
-        //                     docker pull ${DOCKER_IMAGE}:${DOCKER_TAG} &&
-        //                     docker stop ${APP_NAME} || true &&
-        //                     docker rm ${APP_NAME} || true &&
-        //                     docker run -d \
-        //                         --name ${APP_NAME} \
-        //                         -p ${APP_PORT}:${CONTAINER_PORT} \
-        //                         --restart unless-stopped \
-        //                         -e SPRING_PROFILES_ACTIVE=staging \
-        //                         ${DOCKER_IMAGE}:${DOCKER_TAG} &&
-        //                     sleep 10 &&
-        //                     docker ps | grep ${APP_NAME}
-        //                 '
-        //             """
-        //         }
-        //     }
-        //     post {
-        //         success {
-        //             echo "✅ Staging deployment successful!"
-        //         }
-        //         failure {
-        //             echo "❌ Staging deployment failed!"
-        //         }
-        //     }
-        // }
 
 
         // stage('Deploy to Production') {
