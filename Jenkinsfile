@@ -108,6 +108,7 @@ pipeline {
             steps {
                 echo '========== SONARQUBE ANALYSIS =========='
                 withSonarQubeEnv('sonarqube') {
+                    sh 'ls -lart'
                     sh '''
                         mvn sonar:sonar \
                             -Dsonar.projectKey=kevin_82_webapp \
