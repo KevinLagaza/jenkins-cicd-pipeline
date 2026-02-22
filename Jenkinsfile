@@ -6,7 +6,6 @@ pipeline {
         MAVEN_IMAGE = 'maven:3.9.6-eclipse-temurin-17-alpine'
         DOCKER_IMAGE = 'kevinlagaza/${APP_NAME}'
         DOCKER_TAG = '${BUILD_NUMBER}'
-        // REGISTRY_URL = 'https://index.docker.io/v1/'
         DOCKER_CREDENTIALS = 'dockerhub-credentials'
     }
 
@@ -27,83 +26,83 @@ pipeline {
             }
         }
 
-        // stage('Unit Tests') {
-        //     agent {
-        //         docker {
-        //             image "${MAVEN_IMAGE}"
-        //             args '-v $HOME/.m2:/root/.m2'
-        //             reuseNode true
-        //         }
-        //     }
-        //     steps {
-        //         echo '========== UNIT TESTS =========='
-        //         sh 'mvn test -Dtest=*Test'
-        //         echo '========== FINISHED UNIT TESTS =========='
-        //     }
-        //     post {
-        //         always {
-        //             junit allowEmptyResults: true, testResults: '**/target/surefire-reports/*.xml'
-        //         }
-        //     }
-        // }
+        stage('Unit Tests') {
+            agent {
+                docker {
+                    image "${MAVEN_IMAGE}"
+                    args '-v $HOME/.m2:/root/.m2'
+                    reuseNode true
+                }
+            }
+            steps {
+                echo '========== UNIT TESTS =========='
+                sh 'mvn test -Dtest=*Test'
+                echo '========== FINISHED UNIT TESTS =========='
+            }
+            post {
+                always {
+                    junit allowEmptyResults: true, testResults: '**/target/surefire-reports/*.xml'
+                }
+            }
+        }
 
-        // stage('Integration Tests') {
-        //     agent {
-        //         docker {
-        //             image "${MAVEN_IMAGE}"
-        //             args '-v $HOME/.m2:/root/.m2'
-        //             reuseNode true
-        //         }
-        //     }
-        //     steps {
-        //         echo '========== INTEGRATION TESTS =========='
-        //         sh 'mvn verify -Dtest=*IT -DfailIfNoTests=false'
-        //         echo '========== FINISHED INTEGRATION TESTS =========='
-        //     }
-        //     post {
-        //         always {
-        //             junit allowEmptyResults: true, testResults: '**/target/failsafe-reports/*.xml'
-        //         }
-        //     }
-        // }
+        stage('Integration Tests') {
+            agent {
+                docker {
+                    image "${MAVEN_IMAGE}"
+                    args '-v $HOME/.m2:/root/.m2'
+                    reuseNode true
+                }
+            }
+            steps {
+                echo '========== INTEGRATION TESTS =========='
+                sh 'mvn verify -Dtest=*IT -DfailIfNoTests=false'
+                echo '========== FINISHED INTEGRATION TESTS =========='
+            }
+            post {
+                always {
+                    junit allowEmptyResults: true, testResults: '**/target/failsafe-reports/*.xml'
+                }
+            }
+        }
 
-        // stage ('Checkstyle Code Analysis'){
-        //     agent {
-        //         docker {
-        //             image "${MAVEN_IMAGE}"
-        //             args '-v $HOME/.m2:/root/.m2'
-        //             reuseNode true
-        //         }
-        //     }
-        //     steps {
-        //         echo '========== CHECKSTYLE ANALYSIS =========='
-        //         sh 'mvn checkstyle:checkstyle'
-        //         echo '========== FINISHED CHECKSTYLE ANALYSIS =========='
-        //     }
-        // }
+        stage ('Checkstyle Code Analysis'){
+            agent {
+                docker {
+                    image "${MAVEN_IMAGE}"
+                    args '-v $HOME/.m2:/root/.m2'
+                    reuseNode true
+                }
+            }
+            steps {
+                echo '========== CHECKSTYLE ANALYSIS =========='
+                sh 'mvn checkstyle:checkstyle'
+                echo '========== FINISHED CHECKSTYLE ANALYSIS =========='
+            }
+        }
 
-        // stage('SonarQube Analysis') {
-        //     agent {
-        //         docker {
-        //             image "${MAVEN_IMAGE}"
-        //             args '-v $HOME/.m2:/root/.m2'
-        //             reuseNode true
-        //         }
-        //     }
-        //     steps {
-        //         echo '========== SONARQUBE ANALYSIS =========='
-        //         withSonarQubeEnv('sonarqube') {
-        //             sh '''
-        //                 mvn sonar:sonar \
-        //                     -Dsonar.projectKey=kevin_82_webapp \
-        //                     -Dsonar.organization=samson-jean \
-        //                     -Dsonar.projectVersion=1.0 \
-        //                     -Dsonar.java.source=17
-        //             '''
-        //         }
-        //         echo '========== FINISHED SONARQUBE ANALYSIS =========='
-        //     }
-        // }
+        stage('SonarQube Analysis') {
+            agent {
+                docker {
+                    image "${MAVEN_IMAGE}"
+                    args '-v $HOME/.m2:/root/.m2'
+                    reuseNode true
+                }
+            }
+            steps {
+                echo '========== SONARQUBE ANALYSIS =========='
+                withSonarQubeEnv('sonarqube') {
+                    sh '''
+                        mvn sonar:sonar \
+                            -Dsonar.projectKey=kevin_82_webapp \
+                            -Dsonar.organization=samson-jean \
+                            -Dsonar.projectVersion=1.0 \
+                            -Dsonar.java.source=17
+                    '''
+                }
+                echo '========== FINISHED SONARQUBE ANALYSIS =========='
+            }
+        }
 
 
         stage('Compilation') {
@@ -137,7 +136,6 @@ pipeline {
             }
             steps {
                 echo '========== BUILD DOCKER IMAGE =========='
-                sh 'ls -al'
                 sh "docker build -t ${DOCKER_IMAGE}:${DOCKER_TAG} ."
                 echo '========== FINISHED BUILDING DOCKER IMAGE =========='
             }
