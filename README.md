@@ -16,21 +16,21 @@ The objective of this project is to design a **Continuous Integration (CI)** and
 
 Recall that whether you are running Jenkins on a host machine or docker container, make sure that **docker** is installed. 
 
-1) SonarCloud
+**1) SonarCloud**
 
 Create a sonarcloud account and generate a token that will be used in Jenkins. 
 
 **![Generating the sonar token ](./images/prerequisites/generate-sonar-token-jenkins.png)**
 
-2) Jenkins
+**2) Jenkins**
 
 ---
 a) Install the following plugins:
 
-* Docker Pipeline
-* SonarQube Scanner (for static code analysis)
-* SSH Agent (for deployment)
-* Slack Notification (for notification)
+* **Docker Pipeline**
+* **SonarQube Scanner** (for static code analysis)
+* **SSH Agent** (for deployment)
+* **Slack Notification** (for notification)
 
 
 b) Add **dockerhub** and **sonarcloud** credentials under Global scope
@@ -41,7 +41,9 @@ b) Add **dockerhub** and **sonarcloud** credentials under Global scope
 
 c) Add **STAGING_SSH_KEY** and **PRODUCTION_SSH_KEY** credentials under Jenkins scope
 
-## 1) Automated testing
+**![SSH keys](./images/prerequisites/ssh-key.png)**
+
+## **1) Automated testing**
 
 We will execute unitary and integration tests.
 
@@ -49,7 +51,7 @@ We will execute unitary and integration tests.
 
 ***
 
-## 2) Code quality
+## **2) Code quality**
 
 We want to perform a static analysis of the code using SonarCloud. First, make sure to add the sonar token (done in the prerequisites' section) in the global credentials.  
 
@@ -57,7 +59,7 @@ We want to perform a static analysis of the code using SonarCloud. First, make s
 
 **![Sonarqube results](./images/security/sonarqube_results.png)**
 
-## 3) Compilation and Packaging
+## **3) Compilation and Packaging**
 
 Now, we want to build the jar file, then build the docker image and push the latter into DockerHub.
 
@@ -66,11 +68,11 @@ Now, we want to build the jar file, then build the docker image and push the lat
 **![Dockerhub](./images/docker/dockerhub_image.png)**
 
 
-## 4) Deployment in staging environment
+## **4) Deployment in staging environment**
 
-## 5) Deployment in production environment
+## **5) Deployment in production environment**
 
-## 6) Validation tests
+## **6) Validation tests**
 
 
 
