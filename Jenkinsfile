@@ -200,6 +200,7 @@ pipeline {
                         ssh -o StrictHostKeyChecking=no ${SSH_USER}@${STAGING_HOST} "
 
                             echo "=== Checking existing MySQL container ===" &&
+                            echo "ls -la" &&
                             if docker ps -a | grep -q ${DB_CONTAINER_NAME}; then
                                 echo "MySQL container exists, checking if running..." &&
                                 if ! docker ps | grep -q ${DB_CONTAINER_NAME}; then
@@ -225,7 +226,6 @@ pipeline {
                             echo \"MySQL IP: \\\$DOCKER_IP\" &&
                             
                             echo "=== Executing SQL scripts ===" &&
-                            echo "ls -la"
                             docker exec -i ${DB_CONTAINER_NAME} mysql -u root -p${DB_ROOT_PASSWORD} < src/main/resources/database/create.sql &&
                             docker exec -i ${DB_CONTAINER_NAME} mysql -u root -p${DB_ROOT_PASSWORD} ${DB_NAME} < src/main/resources/database/data.sql &&
 
