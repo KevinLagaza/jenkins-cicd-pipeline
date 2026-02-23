@@ -238,8 +238,8 @@ pipeline {
                             echo \"MySQL IP: \\\$DOCKER_IP\" &&
                             
                             echo "=== Executing SQL scripts ===" &&
-                            docker exec -i ${DB_CONTAINER_NAME} mysql -u root -p${DB_ROOT_PASSWORD} < jenkins-cicd-pipeline/src/main/resources/database/create.sql &&
-                            docker exec -i ${DB_CONTAINER_NAME} mysql -u root -p${DB_ROOT_PASSWORD} ${DB_NAME} < jenkins-cicd-pipeline/src/main/resources/database/data.sql &&
+                            docker exec -i ${DB_CONTAINER_NAME} mysql -u root -p${DB_ROOT_PASSWORD} < /tmp/database/create.sql &&
+                            docker exec -i ${DB_CONTAINER_NAME} mysql -u root -p${DB_ROOT_PASSWORD} ${DB_NAME} < /tmp/database/data.sql &&
 
                             echo "=== Pulling new image ===" &&
                             docker pull ${DOCKER_IMAGE}:${DOCKER_TAG} &&
