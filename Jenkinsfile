@@ -256,7 +256,7 @@ pipeline {
                                 ${DOCKER_IMAGE}:${DOCKER_TAG} &&
                             echo "=== Checking the containers ===" &&
                             sleep 15 &&
-                            docker ps &&
+                            docker ps | grep -E "${APP_NAME}|${DB_CONTAINER_NAME}"  &&
                             echo "=== Cleanup ===" &&
                             rm -rf /tmp/database
                         "
