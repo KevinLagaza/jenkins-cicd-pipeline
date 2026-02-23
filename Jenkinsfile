@@ -199,7 +199,7 @@ pipeline {
                     sh """
 
                         echo "=== Creating remote directory ==="
-                            ssh -o StrictHostKeyChecking=no ${SSH_USER}@${STAGING_HOST} "
+                        ssh -o StrictHostKeyChecking=no ${SSH_USER}@${STAGING_HOST} "
                             mkdir -p /tmp/database
                         "
 
@@ -254,9 +254,11 @@ pipeline {
                                 -p ${APP_PORT}:${CONTAINER_PORT} \
                                 -e SPRING_PROFILES_ACTIVE=staging \
                                 ${DOCKER_IMAGE}:${DOCKER_TAG} &&
+                                
                             echo "=== Checking the containers ===" &&
                             sleep 15 &&
                             docker ps | grep -E "${APP_NAME}|${DB_CONTAINER_NAME}"  &&
+
                             echo "=== Cleanup ===" &&
                             rm -rf /tmp/database
                         "
