@@ -209,6 +209,7 @@ pipeline {
                             src/main/resources/database/data.sql \
                             ${SSH_USER}@${STAGING_HOST}:/tmp/database/
 
+                        echo "=== Starting the containers ==="
                         ssh -o StrictHostKeyChecking=no ${SSH_USER}@${STAGING_HOST} "              
 
                             echo "=== Checking existing MySQL container ===" &&
@@ -253,6 +254,9 @@ pipeline {
                                 -p ${APP_PORT}:${CONTAINER_PORT} \
                                 -e SPRING_PROFILES_ACTIVE=staging \
                                 ${DOCKER_IMAGE}:${DOCKER_TAG} &&
+                            echo "=== Checking the containers ===" &&
+                            sleep 15 &&
+                            docker ps &&
                             echo "=== Cleanup ===" &&
                             rm -rf /tmp/database
                         "
