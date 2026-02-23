@@ -253,14 +253,7 @@ pipeline {
                                 --name ${APP_NAME} \
                                 -p ${APP_PORT}:${CONTAINER_PORT} \
                                 -e SPRING_PROFILES_ACTIVE=staging \
-                                ${DOCKER_IMAGE}:${DOCKER_TAG} &&
-                                
-                            echo "=== Checking the containers ===" &&
-                            sleep 15 &&
-                            docker ps | grep -E "${APP_NAME}|${DB_CONTAINER_NAME}"  &&
-
-                            echo "=== Cleanup ===" &&
-                            rm -rf /tmp/database
+                                ${DOCKER_IMAGE}:${DOCKER_TAG}
                         "
                     """
                 }
