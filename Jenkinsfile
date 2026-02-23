@@ -197,10 +197,19 @@ pipeline {
                 echo "========== DEPLOY TO STAGING =========="
                 sshagent(credentials: ["${STAGING_SSH_KEY}"]) {
                     sh """
-                        ssh -o StrictHostKeyChecking=no ${SSH_USER}@${STAGING_HOST} "
 
-                            echo "=== Cloning the repo ===" &&
-                            git clone https://github.com/KevinLagaza/jenkins-cicd-pipeline.git &&               
+                        echo "=== Creating remote directory ==="
+                            ssh -o StrictHostKeyChecking=no ${SSH_USER}@${STAGING_HOST} "
+                            mkdir -p /tmp/database
+                        "
+
+                        echo "=== Copying SQL files to staging server ==="
+                        scp -o StrictHostKeyChecking=no \
+                            src/main/resources/database/create.sql \
+                            src/main/resources/database/data.sql \
+                            ${SSH_USER}@${STAGING_HOST}:/tmp/database/
+
+                        ssh -o StrictHostKeyChecking=no ${SSH_USER}@${STAGING_HOST} "              
 
                             echo "=== Checking existing MySQL container ===" &&
                             if docker ps -a | grep -q ${DB_CONTAINER_NAME}; then
@@ -228,8 +237,8 @@ pipeline {
                             echo \"MySQL IP: \\\$DOCKER_IP\" &&
                             
                             echo "=== Executing SQL scripts ===" &&
-                            docker exec -i ${DB_CONTAINER_NAME} mysql -u root -p${DB_ROOT_PASSWORD} < src/main/resources/database/create.sql &&
-                            docker exec -i ${DB_CONTAINER_NAME} mysql -u root -p${DB_ROOT_PASSWORD} ${DB_NAME} < src/main/resources/database/data.sql &&
+                            docker exec -i ${DB_CONTAINER_NAME} mysql -u root -p${DB_ROOT_PASSWORD} < jenkins-cicd-pipeline/src/main/resources/database/create.sql &&
+                            docker exec -i ${DB_CONTAINER_NAME} mysql -u root -p${DB_ROOT_PASSWORD} ${DB_NAME} < jenkins-cicd-pipeline/src/main/resources/database/data.sql &&
 
                             echo "=== Pulling new image ===" &&
                             docker pull ${DOCKER_IMAGE}:${DOCKER_TAG} &&
@@ -243,7 +252,9 @@ pipeline {
                                 --name ${APP_NAME} \
                                 -p ${APP_PORT}:${CONTAINER_PORT} \
                                 -e SPRING_PROFILES_ACTIVE=staging \
-                                ${DOCKER_IMAGE}:${DOCKER_TAG}
+                                ${DOCKER_IMAGE}:${DOCKER_TAG} &&
+                            echo "=== Cleanup ===" &&
+                            rm -rf /tmp/database
                         "
                     """
                 }
