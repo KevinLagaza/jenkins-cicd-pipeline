@@ -225,8 +225,9 @@ pipeline {
                             echo \"MySQL IP: \\\$DOCKER_IP\" &&
                             
                             echo "=== Executing SQL scripts ===" &&
-                            docker exec -i ${DB_CONTAINER_NAME} mysql -u root -p${DB_ROOT_PASSWORD} < /tmp/create.sql &&
-                            docker exec -i ${DB_CONTAINER_NAME} mysql -u root -p${DB_ROOT_PASSWORD} ${DB_NAME} < /tmp/data.sql &&
+                            echo "ls -la"
+                            docker exec -i ${DB_CONTAINER_NAME} mysql -u root -p${DB_ROOT_PASSWORD} < src/main/resources/database/create.sql &&
+                            docker exec -i ${DB_CONTAINER_NAME} mysql -u root -p${DB_ROOT_PASSWORD} ${DB_NAME} < src/main/resources/database/data.sql &&
 
                             echo "=== Pulling new image ===" &&
                             docker pull ${DOCKER_IMAGE}:${DOCKER_TAG} &&
