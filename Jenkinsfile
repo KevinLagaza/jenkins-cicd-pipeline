@@ -199,6 +199,9 @@ pipeline {
                     sh """
                         ssh -o StrictHostKeyChecking=no ${SSH_USER}@${STAGING_HOST} "
 
+                            echo "=== Cloning the repo ===" &&
+                            git clone https://github.com/KevinLagaza/jenkins-cicd-pipeline.git &&               
+
                             echo "=== Checking existing MySQL container ===" &&
                             echo "ls -la" &&
                             if docker ps -a | grep -q ${DB_CONTAINER_NAME}; then
@@ -242,7 +245,6 @@ pipeline {
                                 -p ${APP_PORT}:${CONTAINER_PORT} \
                                 -e SPRING_PROFILES_ACTIVE=staging \
                                 ${DOCKER_IMAGE}:${DOCKER_TAG}
-                        "
                     """
                 }
             }
