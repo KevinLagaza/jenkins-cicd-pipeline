@@ -84,6 +84,10 @@ Now, we want to build the jar file, then build the docker image and push the lat
 
 **![Stage deploy](./images/deployment/stage_deploy.png)**
 
+**![Stage deploy](./images/deployment/app_staging_interface.png)**
+
+**![Stage deploy](./images/deployment/inside_app_staging_interface.png)**
+
 ## **5) Deployment and Validation in production environment**
 
 **![Prod deploy](./images/deployment/deploy_prod.png)**
