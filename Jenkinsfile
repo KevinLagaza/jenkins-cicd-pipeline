@@ -276,9 +276,7 @@ pipeline {
                     sh """
                         ssh -o StrictHostKeyChecking=no ${SSH_USER}@${STAGING_HOST} "
 
-                            echo "=== Staging deployment verification ===" &&
                             docker ps | grep -E "${APP_NAME}|${DB_CONTAINER_NAME}" &&
-
                             echo "=== Cleanup ===" &&
                             rm -rf /tmp/database
                         "
@@ -383,8 +381,6 @@ pipeline {
                 sshagent(credentials: ["${PRODUCTION_SSH_KEY}"]) {
                     sh """
                         ssh -o StrictHostKeyChecking=no ${SSH_USER}@${PRODUCTION_HOST} "
-
-                            echo "=== Production deployment verification ===" &&
                             docker ps | grep -E "${APP_NAME}|${DB_CONTAINER_NAME}" &&
                 
                             echo "=== Cleanup ===" &&
@@ -399,9 +395,11 @@ pipeline {
 
     post {
         success {
+            echo "✅ Staging deployment successful!"
             slackSend (color: '#00FF00', message: "SUCCESSFUL: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")
         }
         failure {
+            echo "❌ Staging deployment failed!"
             slackSend (color: '#FF0000', message: "FAILED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")
         }
         always {
