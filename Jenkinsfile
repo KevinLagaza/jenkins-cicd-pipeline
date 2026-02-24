@@ -197,7 +197,6 @@ pipeline {
                 echo "========== DEPLOY TO STAGING =========="
                 sshagent(credentials: ["${STAGING_SSH_KEY}"]) {
                     sh """
-
                         echo "=== Creating remote directory ==="
                         ssh -o StrictHostKeyChecking=no ${SSH_USER}@${STAGING_HOST} "
                             mkdir -p /tmp/database
@@ -303,7 +302,6 @@ pipeline {
                 echo "========== DEPLOY TO PRODUCTION =========="
                 sshagent(credentials: ["${PRODUCTION_SSH_KEY}"]) {
                     sh """
-
                         echo "=== Creating remote directory ==="
                         ssh -o StrictHostKeyChecking=no ${SSH_USER}@${PRODUCTION_HOST} "
                             mkdir -p /tmp/database

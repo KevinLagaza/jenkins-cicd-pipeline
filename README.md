@@ -32,6 +32,12 @@ a) Install the following plugins:
 * **SSH Agent** (for deployment)
 * **Slack Notification** (for notification)
 
+**3) **Slack**
+
+- Create a channel where notifications will be sent 
+- Choose Jenkins from Apps to be installed and click on arrow **Go to app**
+- Retrieve the token to be added in Jenkins credentials
+- 
 
 b) Add **dockerhub** and **sonarcloud** credentials under Global scope
 
