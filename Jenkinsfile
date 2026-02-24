@@ -391,10 +391,12 @@ pipeline {
 
     post {
         success {
-            echo "✅ Staging deployment successful!"
+            echo "✅ Pipeline execution successful!"
+            slackSend (color: '#00FF00', message: "SUCCESSFUL: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")
         }
         failure {
-            echo "❌ Staging deployment failed!"
+            echo "❌ Pipeline execution failed!"
+            slackSend (color: '#FF0000', message: "FAILED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")
         }
         always {
             cleanWs()
