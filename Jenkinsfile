@@ -283,6 +283,7 @@ pipeline {
 
                         echo "=== Staging deployment verification ===" &&
                         docker ps | grep -E "${APP_NAME}|${DB_CONTAINER_NAME}" &&
+                        curl ${HOSTNAME_DEPLOY_STAGING}:${APP_PORT} &&
             
                         echo "=== Cleanup ===" &&
                         rm -rf /tmp/database
@@ -364,6 +365,7 @@ pipeline {
                             
                             echo "=== Deployment verification ===" &&
                             docker ps | grep -E "${APP_NAME}|${DB_CONTAINER_NAME}" &&
+                            curl ${HOSTNAME_DEPLOY_PRODUCTION}:${APP_PORT} &&
                 
                             echo "=== Cleanup ===" &&
                             rm -rf /tmp/database
