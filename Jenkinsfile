@@ -275,7 +275,6 @@ pipeline {
                 sshagent(credentials: ["${STAGING_SSH_KEY}"]) {
                     sh """
                         ssh -o StrictHostKeyChecking=no ${SSH_USER}@${STAGING_HOST} "
-
                             docker ps | grep -E "${APP_NAME}|${DB_CONTAINER_NAME}" &&
                             echo "=== Cleanup ===" &&
                             rm -rf /tmp/database
@@ -382,7 +381,6 @@ pipeline {
                     sh """
                         ssh -o StrictHostKeyChecking=no ${SSH_USER}@${PRODUCTION_HOST} "
                             docker ps | grep -E "${APP_NAME}|${DB_CONTAINER_NAME}" &&
-                
                             echo "=== Cleanup ===" &&
                             rm -rf /tmp/database
                         "
