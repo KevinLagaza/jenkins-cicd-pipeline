@@ -198,9 +198,9 @@ pipeline {
                 sshagent(credentials: ["${STAGING_SSH_KEY}"]) {
                     sh """
                         echo "=== Creating remote directory ==="
-                        ssh -o StrictHostKeyChecking=no ${SSH_USER}@${STAGING_HOST} '
+                        ssh -o StrictHostKeyChecking=no ${SSH_USER}@${STAGING_HOST} "
                             mkdir -p /tmp/database
-                        '
+                        "
 
                         echo "=== Copying SQL files to staging server ==="
                         scp -o StrictHostKeyChecking=no \
@@ -209,7 +209,7 @@ pipeline {
                             ${SSH_USER}@${STAGING_HOST}:/tmp/database/
 
                         echo "=== Starting the containers ==="
-                        ssh -o StrictHostKeyChecking=no ${SSH_USER}@${STAGING_HOST} '              
+                        ssh -o StrictHostKeyChecking=no ${SSH_USER}@${STAGING_HOST} "              
 
                             echo "=== Checking existing MySQL container ===" &&
                             if docker ps -a | grep -q ${DB_CONTAINER_NAME}; then
@@ -254,7 +254,7 @@ pipeline {
                                 -e SPRING_PROFILES_ACTIVE=staging \
                                 ${DOCKER_IMAGE}:${DOCKER_TAG} &&
                             sleep 15
-                        '
+                        "
                     """
                 }
             }
@@ -297,9 +297,7 @@ pipeline {
                 sshagent(credentials: ["${PRODUCTION_SSH_KEY}"]) {
                     sh """
                         echo "=== Creating remote directory ==="
-                        ssh -o StrictHostKeyChecking=no ${SSH_USER}@${PRODUCTION_HOST} '
-                            mkdir -p /tmp/database
-                        '
+                        ssh -o StrictHostKeyChecking=no ${SSH_USER}@${PRODUCTION_HOST} "mkdir -p /tmp/database"
 
                         echo "=== Copying SQL files to production server ==="
                         scp -o StrictHostKeyChecking=no \
@@ -308,7 +306,7 @@ pipeline {
                             ${SSH_USER}@${PRODUCTION_HOST}:/tmp/database/
 
                         echo "=== Starting the containers ==="
-                        ssh -o StrictHostKeyChecking=no ${SSH_USER}@${PRODUCTION_HOST} '              
+                        ssh -o StrictHostKeyChecking=no ${SSH_USER}@${PRODUCTION_HOST} "              
 
                             echo "=== Checking existing MySQL container ===" &&
                             if docker ps -a | grep -q ${DB_CONTAINER_NAME}; then
@@ -353,7 +351,7 @@ pipeline {
                                 -e SPRING_PROFILES_ACTIVE=production \
                                 ${DOCKER_IMAGE}:${DOCKER_TAG} &&
                             sleep 15
-                        '
+                        "
                     """
                 }
             }
