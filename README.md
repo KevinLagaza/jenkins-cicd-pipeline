@@ -92,5 +92,9 @@ Now, we want to build the jar file, then build the docker image and push the lat
 
 **![Prod deploy](./images/deployment/deploy_prod.png)**
 
+## **6) Slack notification**
+
+**![Slack notif](./images/deployment/slack_notif.png)**
+
 
 
