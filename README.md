@@ -36,8 +36,7 @@ a) Install the following plugins:
 
 - Create a channel where notifications will be sent 
 - Choose Jenkins from Apps to be installed and click on arrow **Go to app**
-- Retrieve the token to be added in Jenkins credentials
-- 
+- Retrieve the **Team Subdomain** and **Integration Token Credential ID** to be added in Jenkins credentials and during the configuration
 
 b) Add **dockerhub** and **sonarcloud** credentials under Global scope
 
