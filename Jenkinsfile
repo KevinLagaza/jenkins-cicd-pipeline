@@ -294,19 +294,19 @@ pipeline {
 
             steps {
                 echo "========== DEPLOY TO PRODUCTION =========="
-                sshagent(credentials: ["${STAGING_SSH_KEY}"]) {
+                sshagent(credentials: ["${PRODUCTION_SSH_KEY}"]) {
                     sh """
                         echo "=== Creating remote directory ==="
-                        ssh -o StrictHostKeyChecking=no ${SSH_USER}@${STAGING_HOST} "mkdir -p /tmp/database"
+                        ssh -o StrictHostKeyChecking=no ${SSH_USER}@${PRODUCTION_HOST} "mkdir -p /tmp/database"
 
                         echo "=== Copying SQL files to production server ==="
                         scp -o StrictHostKeyChecking=no \
                             src/main/resources/database/create.sql \
                             src/main/resources/database/data.sql \
-                            ${SSH_USER}@${STAGING_HOST}:/tmp/database/
+                            ${SSH_USER}@${PRODUCTION_HOST}:/tmp/database/
 
                         echo "=== Starting the containers ==="
-                        ssh -o StrictHostKeyChecking=no ${SSH_USER}@${STAGING_HOST} "              
+                        ssh -o StrictHostKeyChecking=no ${SSH_USER}@${PRODUCTION_HOST} "              
 
                             echo "=== Checking existing MySQL container ===" &&
                             if docker ps -a | grep -q ${DB_CONTAINER_NAME}; then
@@ -375,9 +375,9 @@ pipeline {
 
             steps {
                 echo "========== TESTING APP IN PRODUCTION =========="
-                sshagent(credentials: ["${STAGING_SSH_KEY}"]) {
+                sshagent(credentials: ["${PRODUCTION_SSH_KEY}"]) {
                     sh """
-                        ssh -o StrictHostKeyChecking=no ${SSH_USER}@${STAGING_HOST} '
+                        ssh -o StrictHostKeyChecking=no ${SSH_USER}@${PRODUCTION_HOST} '
                             docker ps | grep -E "${APP_NAME}|${DB_CONTAINER_NAME}" &&
                             echo "=== Cleanup ===" &&
                             rm -rf /tmp/database
