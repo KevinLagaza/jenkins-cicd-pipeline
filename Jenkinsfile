@@ -280,10 +280,7 @@ pipeline {
                             docker ps | grep -E "${APP_NAME}|${DB_CONTAINER_NAME}" &&
 
                             echo "=== Cleanup ===" &&
-                            rm -rf /tmp/database &&
-
-                            echo "=== App testing staging ===" &&
-                            curl ${HOSTNAME_DEPLOY_STAGING}:${APP_PORT}
+                            rm -rf /tmp/database
                         "
                     """
                 }
@@ -391,10 +388,7 @@ pipeline {
                             docker ps | grep -E "${APP_NAME}|${DB_CONTAINER_NAME}" &&
                 
                             echo "=== Cleanup ===" &&
-                            rm -rf /tmp/database &&
-
-                            echo "=== App testing staging ===" &&
-                            curl ${HOSTNAME_DEPLOY_PRODUCTION}:${APP_PORT}
+                            rm -rf /tmp/database
                         "
                     """
                 }
@@ -405,10 +399,10 @@ pipeline {
 
     post {
         success {
-            echo '✅ Pipeline completed successfully!'
+            slackSend (color: '#00FF00', message: "SUCCESSFUL: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")
         }
         failure {
-            echo '❌ Pipeline failed!'
+            slackSend (color: '#FF0000', message: "FAILED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")
         }
         always {
             cleanWs()
