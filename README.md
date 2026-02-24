@@ -34,9 +34,16 @@ a) Install the following plugins:
 
 **3) **Slack**
 
-- Create a channel where notifications will be sent 
-- Choose Jenkins from Apps to be installed and click on arrow **Go to app**
-- Retrieve the **Team Subdomain** and **Integration Token Credential ID** to be added in Jenkins credentials and during the configuration
+- Step 1: Create a channel where notifications will be sent 
+- Step 2: Choose Jenkins from Apps to be installed and click on arrow **Go to app**
+
+**![Add Jenkins](./images/prerequisites/add-jenkins-to-slack.png)**
+
+**![Go to Jenkins App](./images/prerequisites/go-to-jenkins-app.png)**
+
+- Step 3: Retrieve the **Team Subdomain** and **Integration Token Credential ID** to be added in Jenkins credentials and during the configuration. Then, test the connection to ensure that it works well
+
+**![Slack in Jenkins](./images/prerequisites/slack-token.png)**
 
 b) Add **dockerhub** and **sonarcloud** credentials under Global scope
 
@@ -73,11 +80,13 @@ Now, we want to build the jar file, then build the docker image and push the lat
 **![Dockerhub](./images/docker/dockerhub_image.png)**
 
 
-## **4) Deployment in staging environment**
+## **4) Deployment and Validation in staging environment**
 
-## **5) Deployment in production environment**
+**![Stage deploy](./images/deployment/stage_deploy.png)**
 
-## **6) Validation tests**
+## **5) Deployment and Validation in production environment**
+
+**![Prod deploy](./images/deployment/deploy_prod.png)**
 
 
 
