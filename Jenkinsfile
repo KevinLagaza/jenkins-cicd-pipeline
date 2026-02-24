@@ -253,7 +253,14 @@ pipeline {
                                 --name ${APP_NAME} \
                                 -p ${APP_PORT}:${CONTAINER_PORT} \
                                 -e SPRING_PROFILES_ACTIVE=staging \
-                                ${DOCKER_IMAGE}:${DOCKER_TAG}
+                                ${DOCKER_IMAGE}:${DOCKER_TAG} &&
+                            sleep 15 &&
+
+                            echo "=== Deployment verification ===" &&
+                            docker ps | grep -E "${APP_NAME}|${DB_CONTAINER_NAME}" &&
+                
+                            echo "=== Cleanup ===" &&
+                            rm -rf /tmp/database
                         "
                     """
                 }
@@ -265,6 +272,22 @@ pipeline {
                 failure {
                     echo "❌ Staging deployment failed!"
                 }
+            }
+        }
+
+        steps {
+            echo "========== TESTING APP IN STAGING =========="
+            sshagent(credentials: ["${STAGING_SSH_KEY}"]) {
+                sh """
+                    ssh -o StrictHostKeyChecking=no ${SSH_USER}@${STAGING_HOST} "
+
+                        echo "=== Staging deployment verification ===" &&
+                        docker ps | grep -E "${APP_NAME}|${DB_CONTAINER_NAME}" &&
+            
+                        echo "=== Cleanup ===" &&
+                        rm -rf /tmp/database
+                    "
+                """
             }
         }
 
@@ -336,7 +359,14 @@ pipeline {
                                 --name ${APP_NAME} \
                                 -p ${APP_PORT}:${CONTAINER_PORT} \
                                 -e SPRING_PROFILES_ACTIVE=production \
-                                ${DOCKER_IMAGE}:${DOCKER_TAG}
+                                ${DOCKER_IMAGE}:${DOCKER_TAG} &&
+                            sleep 15 &&
+                            
+                            echo "=== Deployment verification ===" &&
+                            docker ps | grep -E "${APP_NAME}|${DB_CONTAINER_NAME}" &&
+                
+                            echo "=== Cleanup ===" &&
+                            rm -rf /tmp/database
                         "
                     """
                 }
@@ -351,14 +381,41 @@ pipeline {
             }
         }
 
+        stage('Deploy to Production') {
+
+            when {
+                expression { 
+                    return env.GIT_BRANCH == 'origin/main'
+                }
+            }
+
+            steps {
+                echo "========== TESTING APP IN PRODUCTION =========="
+                sshagent(credentials: ["${PRODUCTION_SSH_KEY}"]) {
+                    sh """
+                        ssh -o StrictHostKeyChecking=no ${SSH_USER}@${PRODUCTION_HOST} "
+
+                            echo "=== Production deployment verification ===" &&
+                            docker ps | grep -E "${APP_NAME}|${DB_CONTAINER_NAME}" &&
+                
+                            echo "=== Cleanup ===" &&
+                            rm -rf /tmp/database
+                        "
+                    """
+                }
+            }
+        }
+
     }
 
     post {
         success {
             echo '✅ Pipeline completed successfully!'
+            slackSend (color: '#00FF00', message: "SUCCESSFUL: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")
         }
         failure {
             echo '❌ Pipeline failed!'
+            slackSend (color: '#FF0000', message: "FAILED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")
         }
         always {
             cleanWs()
