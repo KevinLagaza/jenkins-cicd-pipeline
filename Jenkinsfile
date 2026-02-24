@@ -275,7 +275,7 @@ pipeline {
             }
         }
 
-        stage('Test in staging')
+        stage('Test in staging') {
 
             steps {
                 echo "========== TESTING APP IN STAGING =========="
