@@ -275,20 +275,17 @@ pipeline {
             }
         }
 
-        steps {
-            echo "========== TESTING APP IN STAGING =========="
-            sshagent(credentials: ["${STAGING_SSH_KEY}"]) {
-                sh """
-                    ssh -o StrictHostKeyChecking=no ${SSH_USER}@${STAGING_HOST} "
+        stage('Test in staging')
 
-                        echo "=== Staging deployment verification ===" &&
-                        docker ps | grep -E "${APP_NAME}|${DB_CONTAINER_NAME}" &&
-                        curl ${HOSTNAME_DEPLOY_STAGING}:${APP_PORT} &&
-            
-                        echo "=== Cleanup ===" &&
-                        rm -rf /tmp/database
-                    "
-                """
+            steps {
+                echo "========== TESTING APP IN STAGING =========="
+                sshagent(credentials: ["${STAGING_SSH_KEY}"]) {
+                    sh """
+                        ssh -o StrictHostKeyChecking=no ${SSH_USER}@${STAGING_HOST} "
+                            curl ${HOSTNAME_DEPLOY_STAGING}:${APP_PORT}
+                        "
+                    """
+                }
             }
         }
 
@@ -363,7 +360,7 @@ pipeline {
                                 ${DOCKER_IMAGE}:${DOCKER_TAG} &&
                             sleep 15 &&
                             
-                            echo "=== Deployment verification ===" &&
+                            echo "=== Production deployment verification ===" &&
                             docker ps | grep -E "${APP_NAME}|${DB_CONTAINER_NAME}" &&
                             curl ${HOSTNAME_DEPLOY_PRODUCTION}:${APP_PORT} &&
                 
@@ -383,7 +380,7 @@ pipeline {
             }
         }
 
-        stage('Deploy to Production') {
+        stage('Test in Production') {
 
             when {
                 expression { 
@@ -396,12 +393,7 @@ pipeline {
                 sshagent(credentials: ["${PRODUCTION_SSH_KEY}"]) {
                     sh """
                         ssh -o StrictHostKeyChecking=no ${SSH_USER}@${PRODUCTION_HOST} "
-
-                            echo "=== Production deployment verification ===" &&
-                            docker ps | grep -E "${APP_NAME}|${DB_CONTAINER_NAME}" &&
-                
-                            echo "=== Cleanup ===" &&
-                            rm -rf /tmp/database
+                            curl ${HOSTNAME_DEPLOY_PRODUCTION}:${APP_PORT}
                         "
                     """
                 }
