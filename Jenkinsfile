@@ -26,6 +26,10 @@ pipeline {
         DB_PORT = '3306'
         DB_ROOT_PASSWORD = 'password'
         DB_NAME = 'paymybuddy'
+
+        // Sonarqube
+        SONAR_PROJECT_KEY = 'kevin_82_webapp'
+        SONAR_ORGANIZATION = 'samson-jean'
     }
 
     stages {
@@ -96,13 +100,13 @@ pipeline {
             steps {
                 echo '========== SONARQUBE ANALYSIS =========='
                 withSonarQubeEnv('sonarqube') {
-                    sh '''
+                    sh """
                         mvn sonar:sonar \
-                            -Dsonar.projectKey=kevin_82_webapp \
-                            -Dsonar.organization=samson-jean \
+                            -Dsonar.projectKey=${PROJECT_KEY} \
+                            -Dsonar.organization=${SONAR_ORGANIZATION} \
                             -Dsonar.projectVersion=1.0 \
                             -Dsonar.java.source=17
-                    '''
+                    """
                 }
                 echo '========== FINISHED SONARQUBE ANALYSIS =========='
             }
