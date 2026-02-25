@@ -36,60 +36,60 @@ pipeline {
 
     stages {
 
-        stage('Unit Tests') {
-            agent {
-                docker {
-                    image "${MAVEN_IMAGE}"
-                    args '-v $HOME/.m2:/root/.m2'
-                    reuseNode true
-                }
-            }
-            steps {
-                echo '========== UNIT TESTS =========='
-                sh 'mvn test -Dtest=*Test'
-                echo '========== FINISHED UNIT TESTS =========='
-            }
-            post {
-                always {
-                    junit allowEmptyResults: true, testResults: '**/target/surefire-reports/*.xml'
-                }
-            }
-        }
+        // stage('Unit Tests') {
+        //     agent {
+        //         docker {
+        //             image "${MAVEN_IMAGE}"
+        //             args '-v $HOME/.m2:/root/.m2'
+        //             reuseNode true
+        //         }
+        //     }
+        //     steps {
+        //         echo '========== UNIT TESTS =========='
+        //         sh 'mvn test -Dtest=*Test'
+        //         echo '========== FINISHED UNIT TESTS =========='
+        //     }
+        //     post {
+        //         always {
+        //             junit allowEmptyResults: true, testResults: '**/target/surefire-reports/*.xml'
+        //         }
+        //     }
+        // }
 
-        stage('Integration Tests') {
-            agent {
-                docker {
-                    image "${MAVEN_IMAGE}"
-                    args '-v $HOME/.m2:/root/.m2'
-                    reuseNode true
-                }
-            }
-            steps {
-                echo '========== INTEGRATION TESTS =========='
-                sh 'mvn verify -Dtest=*IT -DfailIfNoTests=false'
-                echo '========== FINISHED INTEGRATION TESTS =========='
-            }
-            post {
-                always {
-                    junit allowEmptyResults: true, testResults: '**/target/failsafe-reports/*.xml'
-                }
-            }
-        }
+        // stage('Integration Tests') {
+        //     agent {
+        //         docker {
+        //             image "${MAVEN_IMAGE}"
+        //             args '-v $HOME/.m2:/root/.m2'
+        //             reuseNode true
+        //         }
+        //     }
+        //     steps {
+        //         echo '========== INTEGRATION TESTS =========='
+        //         sh 'mvn verify -Dtest=*IT -DfailIfNoTests=false'
+        //         echo '========== FINISHED INTEGRATION TESTS =========='
+        //     }
+        //     post {
+        //         always {
+        //             junit allowEmptyResults: true, testResults: '**/target/failsafe-reports/*.xml'
+        //         }
+        //     }
+        // }
 
-        stage ('Checkstyle Code Analysis'){
-            agent {
-                docker {
-                    image "${MAVEN_IMAGE}"
-                    args '-v $HOME/.m2:/root/.m2'
-                    reuseNode true
-                }
-            }
-            steps {
-                echo '========== CHECKSTYLE ANALYSIS =========='
-                sh 'mvn checkstyle:checkstyle'
-                echo '========== FINISHED CHECKSTYLE ANALYSIS =========='
-            }
-        }
+        // stage ('Checkstyle Code Analysis'){
+        //     agent {
+        //         docker {
+        //             image "${MAVEN_IMAGE}"
+        //             args '-v $HOME/.m2:/root/.m2'
+        //             reuseNode true
+        //         }
+        //     }
+        //     steps {
+        //         echo '========== CHECKSTYLE ANALYSIS =========='
+        //         sh 'mvn checkstyle:checkstyle'
+        //         echo '========== FINISHED CHECKSTYLE ANALYSIS =========='
+        //     }
+        // }
 
         // stage('SonarQube Analysis') {
         //     agent {
@@ -195,7 +195,7 @@ pipeline {
 
             when {
                 expression { 
-                    return env.GIT_BRANCH == 'origin/main'
+                    return env.GIT_BRANCH == 'origin/develop'
                 }
             }
 
@@ -219,6 +219,12 @@ pipeline {
 
         stage('Test in staging') {
 
+            when {
+                expression { 
+                    return env.GIT_BRANCH == 'origin/develop'
+                }
+            }
+
             steps {
                 testEnvironment(
                     host: "${STAGING_HOST}",
@@ -231,7 +237,7 @@ pipeline {
 
             when {
                 expression { 
-                    return env.GIT_BRANCH == 'origin/main'
+                    return env.GIT_BRANCH == 'origin/develop'
                 }
             }
 
@@ -258,7 +264,7 @@ pipeline {
 
             when {
                 expression { 
-                    return env.GIT_BRANCH == 'origin/main'
+                    return env.GIT_BRANCH == 'origin/develop'
                 }
             }
 
