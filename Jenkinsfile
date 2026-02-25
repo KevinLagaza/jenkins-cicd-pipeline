@@ -195,7 +195,7 @@ pipeline {
 
             when {
                 expression { 
-                    return env.GIT_BRANCH == 'origin/develop'
+                    return env.GIT_BRANCH == 'origin/main'
                 }
             }
 
@@ -221,7 +221,7 @@ pipeline {
 
             when {
                 expression { 
-                    return env.GIT_BRANCH == 'origin/develop'
+                    return env.GIT_BRANCH == 'origin/main'
                 }
             }
 
@@ -237,7 +237,7 @@ pipeline {
 
             when {
                 expression { 
-                    return env.GIT_BRANCH == 'origin/develop'
+                    return env.GIT_BRANCH == 'origin/main'
                 }
             }
 
@@ -264,7 +264,7 @@ pipeline {
 
             when {
                 expression { 
-                    return env.GIT_BRANCH == 'origin/develop'
+                    return env.GIT_BRANCH == 'origin/main'
                 }
             }
 
