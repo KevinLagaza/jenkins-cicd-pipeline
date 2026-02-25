@@ -26,12 +26,12 @@ pipeline {
         // Database Configuration
         DB_CONTAINER_NAME = 'mysql-paymybuddy'
         DB_PORT = '3306'
-        DB_ROOT_PASSWORD = 'password'
+        DB_ROOT_PASSWORD = credentials('db-root-pwd')
         DB_NAME = 'paymybuddy'
 
         // Sonarqube
-        SONAR_PROJECT_KEY = 'kevin_82_webapp'
-        SONAR_ORGANIZATION = 'samson-jean'
+        SONAR_PROJECT_KEY = credentials('sonar-project-key')
+        SONAR_ORGANIZATION = credentials('sonar-organization')
     }
 
     stages {
