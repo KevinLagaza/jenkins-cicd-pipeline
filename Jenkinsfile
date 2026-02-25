@@ -275,11 +275,11 @@ pipeline {
     post {
         success {
             echo "✅ Pipeline execution successful!"
-            slackNotifier(buildResult: 'SUCCESS')
+            slackNotifier(buildResult: currentBuild.result)
         }
         failure {
             echo "❌ Pipeline execution failed!"
-            slackNotifier(buildResult: 'FAILURE')
+            slackNotifier(buildResult: currentBuild.result)
         }
         always {
             cleanWs()
