@@ -55,6 +55,11 @@ c) Add **STAGING_SSH_KEY** and **PRODUCTION_SSH_KEY** credentials under Jenkins 
 
 **![SSH keys](./images/prerequisites/ssh-key.png)**
 
+**4) **Shared library**
+
+The idea is to group some reusable functions that can be adapted in the Jenkinsfile. In our case, the functions are located in this [repo](https://github.com/KevinLagaza/shared-library-jenkins.git). Then, follow the instructions as mentionned below:
+- 
+
 ## **1) Automated testing**
 
 We will execute unitary and integration tests.
