@@ -54,7 +54,7 @@ b) Add the following credentials:
 
 **![Go to Jenkins App](./images/prerequisites/go-to-jenkins-app.png)**
 
-- Step 3: Retrieve the **Team Subdomain** and **Integration Token Credential ID** to be added in Jenkins credentials and during the configuration. Then, test the connection to ensure that it works well
+- Step 3: Retrieve the **Team Subdomain** and **Integration Token Credential ID** (under Global scope) to be added in Jenkins credentials and during the configuration. Then, test the connection to ensure that it works well
 
 **![Slack in Jenkins](./images/prerequisites/slack-token.png)**
 
@@ -71,7 +71,12 @@ c) Add **STAGING_SSH_KEY** and **PRODUCTION_SSH_KEY** credentials under Jenkins 
 **4) Shared library**
 
 The idea is to group some reusable functions that can be adapted in the Jenkinsfile. In our case, the functions are located in this [repo](https://github.com/KevinLagaza/shared-library-jenkins.git). Then, follow the instructions as mentionned below:
-- 
+
+- Step 1: Create a repository that contains all the files present in [repo](https://github.com/KevinLagaza/shared-library-jenkins.git)
+- Step 2: Configure the aforementioned repository in Jenkins to retrieve the libraries
+
+**![Shared library setup 1](./images/prerequisites/shared-library.png)**
+
 
 ## **1) Automated testing**
 
@@ -111,6 +116,8 @@ Now, we want to build the jar file, then build the docker image and push the lat
 **![Prod deploy](./images/deployment/deploy_prod.png)**
 
 ## **6) Slack notification**
+
+After the deloyment in both environments, we will get notified about whether it is successful or failed.
 
 **![Slack notif](./images/deployment/slack_notif.png)**
 
