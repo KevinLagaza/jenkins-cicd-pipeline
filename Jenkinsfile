@@ -200,7 +200,7 @@ pipeline {
             }
 
             steps {
-                deployToEnvironment(
+                deployApp(
                         environment: 'staging',
                         host: "${STAGING_HOST}",
                         sshCredentialId: "${STAGING_SSH_KEY}",
@@ -242,7 +242,7 @@ pipeline {
             }
 
             steps {
-                deployToEnvironment(
+                deployApp(
                         environment: 'production',
                         host: "${PRODUCTION_HOST}",
                         sshCredentialId: "${PRODUCTION_SSH_KEY}",
