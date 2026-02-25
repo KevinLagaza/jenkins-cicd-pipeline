@@ -14,7 +14,7 @@ The objective of this project is to design a **Continuous Integration (CI)** and
 
 ## Prerequisites
 
-Recall that whether you are running Jenkins on a host machine or docker container, make sure that **docker** is installed. 
+Recall that whether you are running Jenkins on a host machine or docker container, make sure that **docker** is installed.
 
 **1) SonarCloud**
 
@@ -32,7 +32,20 @@ a) Install the following plugins:
 * **SSH Agent** (for deployment)
 * **Slack Notification** (for notification)
 
-**3) **Slack**
+b) Add the following credentials:
+
+**For global scope**:
+
+- staging-host
+- production-host
+- db-root-pwd
+- sonar-project-key
+
+**For Jenkins scope**:
+- staging-ssh-key
+- production-ssh-key
+
+**3) Slack**
 
 - Step 1: Create a channel where notifications will be sent 
 - Step 2: Choose Jenkins from Apps to be installed and click on arrow **Go to app**
@@ -55,7 +68,7 @@ c) Add **STAGING_SSH_KEY** and **PRODUCTION_SSH_KEY** credentials under Jenkins 
 
 **![SSH keys](./images/prerequisites/ssh-key.png)**
 
-**4) **Shared library**
+**4) Shared library**
 
 The idea is to group some reusable functions that can be adapted in the Jenkinsfile. In our case, the functions are located in this [repo](https://github.com/KevinLagaza/shared-library-jenkins.git). Then, follow the instructions as mentionned below:
 - 
