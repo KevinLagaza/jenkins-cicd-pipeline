@@ -14,7 +14,7 @@ The objective of this project is to design a **Continuous Integration (CI)** and
 
 ## Prerequisites
 
-Recall that whether you are running Jenkins on a host machine or docker container, make sure that **docker** is installed. 
+Recall that whether you are running Jenkins on a host machine or docker container, make sure that **docker** is installed.
 
 **1) SonarCloud**
 
@@ -32,7 +32,20 @@ a) Install the following plugins:
 * **SSH Agent** (for deployment)
 * **Slack Notification** (for notification)
 
-**3) **Slack**
+b) Add the following credentials:
+
+**For global scope**:
+
+- staging-host
+- production-host
+- db-root-pwd
+- sonar-project-key
+
+**For Jenkins scope**:
+- staging-ssh-key
+- production-ssh-key
+
+**3) Slack**
 
 - Step 1: Create a channel where notifications will be sent 
 - Step 2: Choose Jenkins from Apps to be installed and click on arrow **Go to app**
@@ -41,7 +54,7 @@ a) Install the following plugins:
 
 **![Go to Jenkins App](./images/prerequisites/go-to-jenkins-app.png)**
 
-- Step 3: Retrieve the **Team Subdomain** and **Integration Token Credential ID** to be added in Jenkins credentials and during the configuration. Then, test the connection to ensure that it works well
+- Step 3: Retrieve the **Team Subdomain** and **Integration Token Credential ID** (under Global scope) to be added in Jenkins credentials and during the configuration. Then, test the connection to ensure that it works well
 
 **![Slack in Jenkins](./images/prerequisites/slack-token.png)**
 
@@ -54,6 +67,16 @@ b) Add **dockerhub** and **sonarcloud** credentials under Global scope
 c) Add **STAGING_SSH_KEY** and **PRODUCTION_SSH_KEY** credentials under Jenkins scope
 
 **![SSH keys](./images/prerequisites/ssh-key.png)**
+
+**4) Shared library**
+
+The idea is to group some reusable functions that can be adapted in the Jenkinsfile. In our case, the functions are located in this [repo](https://github.com/KevinLagaza/shared-library-jenkins.git). Then, follow the instructions as mentionned below:
+
+- Step 1: Create a repository that contains all the files present in [repo](https://github.com/KevinLagaza/shared-library-jenkins.git)
+- Step 2: Configure the aforementioned repository in Jenkins to retrieve the libraries
+
+**![Shared library setup 1](./images/prerequisites/shared-library.png)**
+
 
 ## **1) Automated testing**
 
@@ -93,6 +116,8 @@ Now, we want to build the jar file, then build the docker image and push the lat
 **![Prod deploy](./images/deployment/deploy_prod.png)**
 
 ## **6) Slack notification**
+
+After the deloyment in both environments, we will get notified about whether it is successful or failed.
 
 **![Slack notif](./images/deployment/slack_notif.png)**
 
